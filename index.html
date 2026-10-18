@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AstraCropz — Satellite Crop Intelligence</title>
+  <meta name="description" content="AI-powered crop health insights from satellite data.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="logo">Astra<span>Cropz</span></a>
+      <div class="nav-links" id="navLinks">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#tool">Try Tool</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#tool" class="btn btn-sm">Launch App</a>
+        <button class="btn btn-sm btn-outline" onclick="openAuthModal('signin')" style="margin-left:8px">Sign In</button>
+      </div>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menu"><span class="hamburger"></span></button>
+    </div>
+  </nav>
+  <header class="hero">
+    <div class="container">
+      <div class="badge">Satellite + AI • Built in India</div>
+      <h1>Crop health insights<br>from space</h1>
+      <p class="hero-sub">AstraCropz turns free satellite imagery into clear, actionable crop intelligence using real Sentinel-2 data.</p>
+      <div class="hero-cta">
+        <a href="#tool" class="btn">Try Free Tool</a>
+        <a href="#how" class="btn btn-outline">See how it works</a>
+      </div>
+    </div>
+  </header>
+  <section id="features" class="section">
+    <div class="container">
+      <h2 class="section-title">Why AstraCropz</h2>
+      <div class="features-grid">
+        <div class="feature-card"><div class="feature-icon">01</div><h3>Real Satellite Data</h3><p>Uses Microsoft Planetary Computer + Sentinel-2 for actual crop monitoring.</p></div>
+        <div class="feature-card"><div class="feature-icon">02</div><h3>Simple Map</h3><p>Click any location on the map and analyze instantly.</p></div>
+        <div class="feature-card"><div class="feature-icon">03</div><h3>AI Summary</h3><p>Gemini generates clear, practical insights for Indian farmers.</p></div>
+        <div class="feature-card"><div class="feature-icon">04</div><h3>Save History</h3><p>All analyses are saved to your account.</p></div>
+      </div>
+    </div>
+  </section>
+  <section id="how" class="section section-alt">
+    <div class="container">
+      <h2 class="section-title">How it works</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><h3>Select field</h3><p>Click on the map or type location.</p></div>
+        <div class="step"><div class="step-num">2</div><h3>Choose date</h3><p>Pick the date for analysis.</p></div>
+        <div class="step"><div class="step-num">3</div><h3>Get insights</h3><p>Real satellite data + AI summary.</p></div>
+      </div>
+    </div>
+  </section>
+  <section id="tool" class="section">
+    <div class="container">
+      <h2 class="section-title">Try the Tool</h2>
+      <div class="tool-wrapper">
+        <div class="tool-sidebar">
+          <h3>Analysis Panel</h3>
+          <div class="form-group"><label>Location</label><input type="text" id="locationInput" value="Prayagraj region"></div>
+          <div class="form-group"><label>Date</label><input type="date" id="dateInput"></div>
+          <div class="form-group"><label>Analysis Type</label><select id="analysisType"><option>Crop Health (NDVI)</option><option>Change Detection</option><option>Water Stress Indicator</option></select></div>
+          <button class="btn btn-full" id="analyzeBtn">Run Analysis</button>
+          <div class="result-box" id="resultBox" style="display:none">
+            <h4>Result</h4>
+            <div class="score">-- <span>/ 100</span></div>
+            <p class="status">Status: --</p>
+            <p class="summary">--</p>
+          </div>
+        </div>
+        <div class="tool-map" id="map"></div>
+      </div>
+    </div>
+  </section>
+  <section id="pricing" class="section section-alt">
+    <div class="container">
+      <h2 class="section-title">Simple Pricing</h2>
+      <div class="pricing-grid" style="max-width:640px">
+        <div class="price-card"><h3>Free</h3><div class="price">₹0<span>/month</span></div><ul><li>5 analyses / month</li><li>Basic crop health</li><li>AI summaries</li></ul><a href="#tool" class="btn btn-outline btn-full">Start Free</a></div>
+        <div class="price-card featured"><div class="popular">Popular</div><h3>Pro</h3><div class="price">₹799<span>/month</span></div><ul><li>100 analyses / month</li><li>Change detection</li><li>Priority support</li></ul><a href="#tool" class="btn btn-full">Get Pro</a></div>
+      </div>
+    </div>
+  </section>
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand"><div class="logo">Astra<span>Cropz</span></div><p>Satellite intelligence for smarter agriculture decisions.</p></div>
+      <div class="footer-links"><a href="#features">Features</a><a href="#tool">Tool</a><a href="#pricing">Pricing</a></div>
+    </div>
+    <div class="container footer-bottom"><p>© 2026 AstraCropz • Built by Shantanu Dutta • Part of the Astrahab vision</p></div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
