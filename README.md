@@ -1,2 +1,5 @@
-# astracropz
-AstraCropz - Satellite Crop Intelligence for Indian farmers
+# AstraCropz
+
+Satellite crop health insights for Indian farms.
+
+Live: https://astracropz.vercel.app
