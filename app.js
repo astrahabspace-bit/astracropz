@@ -1,135 +1,29 @@
-// AstraCropz - Main Application Script
-
-const SUPABASE_URL = 'https://aaztdbodrtqvsprypzfd.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhenRkYm9kcnRxdnNwcnlwemZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyMzM0NzQsImV4cCI6MjEwNzgwOTQ3NH0.jcdojcQCEn4J9BmA46aS0AbByhZAoAFIikmyAU4-Crk';
-const GEMINI_API_KEY = ''; // Set in Vercel Environment Variables as GEMINI_API_KEY
-const PC_STAC_URL = 'https://planetarycomputer.microsoft.com/api/stac/v1/search';
-
-document.addEventListener('DOMContentLoaded', () => {
-  const dateInput = document.getElementById('dateInput');
-  if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
-
-  const mapEl = document.getElementById('map');
-  let currentLat = 25.4358, currentLng = 81.8463;
-
-  if (mapEl) {
-    const map = L.map('map').setView([currentLat, currentLng], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 18 }).addTo(map);
-    const bounds = [[25.445, 81.835],[25.445, 81.855],[25.425, 81.855],[25.425, 81.835]];
-    const field = L.polygon(bounds, { color: '#16a34a', weight: 2, fillColor: '#16a34a', fillOpacity: 0.15 }).addTo(map);
-    field.bindPopup('Sample Field').openPopup();
-    map.on('click', function (e) {
-      currentLat = e.latlng.lat; currentLng = e.latlng.lng;
-      L.popup().setLatLng(e.latlng).setContent(`Lat: ${currentLat.toFixed(5)}<br>Lng: ${currentLng.toFixed(5)}`).openOn(map);
-    });
-  }
-
-  const analyzeBtn = document.getElementById('analyzeBtn');
-  const resultBox = document.getElementById('resultBox');
-
-  if (analyzeBtn && resultBox) {
-    analyzeBtn.addEventListener('click', async () => {
-      analyzeBtn.textContent = 'Searching satellites...';
-      analyzeBtn.disabled = true;
-      resultBox.style.display = 'none';
-
-      const locationText = document.getElementById('locationInput')?.value || 'Unknown';
-      const analysisType = document.getElementById('analysisType')?.value || 'Crop Health';
-      const dateVal = document.getElementById('dateInput')?.value || new Date().toISOString().split('T')[0];
-
-      let satelliteInfo = null;
-      let score = 65 + Math.floor(Math.random() * 25);
-      let statusText = 'Moderately Healthy';
-      let summaryText = '';
-
-      try {
-        const startDate = new Date(dateVal); startDate.setDate(startDate.getDate() - 15);
-        const endDate = new Date(dateVal); endDate.setDate(endDate.getDate() + 5);
-        const searchBody = {
-          collections: ['sentinel-2-l2a'],
-          bbox: [currentLng - 0.05, currentLat - 0.05, currentLng + 0.05, currentLat + 0.05],
-          datetime: `${startDate.toISOString()}/${endDate.toISOString()}`,
-          limit: 5,
-          query: { 'eo:cloud_cover': { lt: 40 } }
-        };
-        const stacRes = await fetch(PC_STAC_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(searchBody)
-        });
-        const stacData = await stacRes.json();
-        if (stacData.features && stacData.features.length > 0) {
-          stacData.features.sort((a, b) => (a.properties['eo:cloud_cover'] || 100) - (b.properties['eo:cloud_cover'] || 100));
-          const best = stacData.features[0];
-          const cloud = (best.properties['eo:cloud_cover'] || 0).toFixed(1);
-          const acquired = best.properties.datetime?.split('T')[0] || dateVal;
-          const platform = best.properties.platform || 'Sentinel-2';
-          satelliteInfo = { cloud, acquired, platform, id: best.id };
-          if (parseFloat(cloud) < 10) score = Math.min(95, score + 8);
-          else if (parseFloat(cloud) > 25) score = Math.max(45, score - 10);
-        }
-      } catch (err) { console.warn(err); }
-
-      if (score >= 80) statusText = 'Healthy';
-      else if (score < 60) statusText = 'Stressed – Needs Attention';
-
-      try {
-        let satContext = 'No recent low-cloud Sentinel-2 scene found.';
-        if (satelliteInfo) satContext = `Real satellite data:\n- Platform: ${satelliteInfo.platform}\n- Date: ${satelliteInfo.acquired}\n- Cloud: ${satelliteInfo.cloud}%`;
-        const prompt = `You are an expert agricultural analyst in India. Write a short professional crop health summary (2-4 sentences).\nLocation: ${locationText}\nDate: ${dateVal}\nScore: ${score}/100\nStatus: ${statusText}\n${satContext}\nBe practical. Mention satellite if available. Give actionable tips.`;
-        if (GEMINI_API_KEY) {
-          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 250 } })
-          });
-          const data = await response.json();
-          summaryText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || `Score ${score}/100 (${statusText}). Monitor the field.`;
-        } else {
-          summaryText = `Score ${score}/100 (${statusText}). ${satelliteInfo ? `Based on Sentinel-2 image from ${satelliteInfo.acquired} with ${satelliteInfo.cloud}% cloud cover.` : 'Limited recent satellite coverage.'} Monitor moisture and irrigation.`;
-        }
-      } catch (err) {
-        summaryText = `Score ${score}/100 (${statusText}). ${satelliteInfo ? `Sentinel-2 from ${satelliteInfo.acquired}.` : ''} Continue monitoring.`;
-      }
-
-      const scoreEl = resultBox.querySelector('.score');
-      const statusEl = resultBox.querySelector('.status');
-      const summaryEl = resultBox.querySelector('.summary');
-      if (scoreEl) scoreEl.innerHTML = `${score} <span>/ 100</span>`;
-      if (statusEl) {
-        statusEl.textContent = 'Status: ' + statusText;
-        statusEl.className = score >= 60 ? 'status healthy' : 'status';
-        statusEl.style.color = score < 60 ? '#dc2626' : '';
-      }
-      if (summaryEl) {
-        let extra = satelliteInfo ? `\n\n📡 ${satelliteInfo.platform} | ${satelliteInfo.acquired} | Cloud ${satelliteInfo.cloud}%` : '';
-        summaryEl.textContent = summaryText + extra;
-      }
-      resultBox.style.display = 'block';
-
-      try {
-        await fetch(`${SUPABASE_URL}/rest/v1/analyses`, {
-          method: 'POST',
-          headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-          body: JSON.stringify({ location_text: locationText, analysis_type: analysisType, score, status: statusText, summary: summaryText, date_analyzed: dateVal, latitude: currentLat, longitude: currentLng })
-        });
-      } catch (e) {}
-
-      analyzeBtn.textContent = 'Run Analysis';
-      analyzeBtn.disabled = false;
-    });
-  }
-
-  const menuToggle = document.getElementById('menuToggle');
-  const navLinks = document.getElementById('navLinks');
-  if (menuToggle && navLinks) {
-    menuToggle.addEventListener('click', () => {
-      const isOpen = navLinks.classList.toggle('open');
-      menuToggle.setAttribute('aria-expanded', isOpen);
-    });
-    navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => {
-      navLinks.classList.remove('open');
-      menuToggle.setAttribute('aria-expanded', 'false');
-    }));
-  }
-});
+var SUPABASE_URL='https://aaztdbodrtqvsprypzfd.supabase.co';
+var SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhenRkYm9kcnRxdnNwcnlwemZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyMzM0NzQsImV4cCI6MjEwNzgwOTQ3NH0.jcdojcQCEn4J9BmA46aS0AbByhZAoAFIikmyAU4-Crk';
+var PC_STAC_URL='https://planetarycomputer.microsoft.com/api/stac/v1/search';
+var FREE_LIMIT=5;
+var DODO_PRODUCT_ID='';
+var DODO_CHECKOUT_BASE='https://checkout.dodopayments.com/buy/';
+var DELHI_LAT=28.6139,DELHI_LNG=77.2090,currentLat=DELHI_LAT,currentLng=DELHI_LNG,demoMap=null,dashMap=null,userPlan='free';
+function isProUser(user){if(!user)return false;try{return localStorage.getItem('astracropz_plan_'+user.id)==='pro';}catch(e){return false;}}
+function setProUser(user){if(!user)return;try{localStorage.setItem('astracropz_plan_'+user.id,'pro');}catch(e){}userPlan='pro';}
+function monthStartISO(){var d=new Date();return new Date(d.getFullYear(),d.getMonth(),1).toISOString();}
+async function countMonthAnalyses(userId,token){try{var url=SUPABASE_URL+'/rest/v1/analyses?user_id=eq.'+encodeURIComponent(userId)+'&created_at=gte.'+encodeURIComponent(monthStartISO())+'&select=id';var res=await fetch(url,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+token,Prefer:'count=exact'}});var range=res.headers.get('content-range');if(range&&range.indexOf('/')!==-1){var total=parseInt(range.split('/')[1],10);if(!isNaN(total))return total;}var rows=await res.json();return Array.isArray(rows)?rows.length:0;}catch(e){return 0;}}
+async function refreshUsageUI(){var el=document.getElementById('usageLine');if(!el)return;var user=await getSessionUser();if(!user){el.style.display='none';return;}if(isProUser(user)){el.style.display='block';el.textContent='Pro plan — unlimited analyses this month';return;}var token=await getAccessToken();var used=await countMonthAnalyses(user.id,token);var left=Math.max(0,FREE_LIMIT-used);el.style.display='block';el.textContent='Free plan: '+used+' / '+FREE_LIMIT+' analyses used this month ('+left+' left)';}
+function startProCheckout(){if(DODO_PRODUCT_ID){var u=DODO_CHECKOUT_BASE+DODO_PRODUCT_ID+'?redirect_url='+encodeURIComponent('https://astracropz.vercel.app/?paid=1');window.location.href=u;}else{openAuthModal('signup');alert('Pro checkout will open after the payment product is connected. You can still use Free (5 analyses / month).');}}
+window.startProCheckout=startProCheckout;
+function handlePaidReturn(){try{var q=new URLSearchParams(location.search);if(q.get('paid')==='1'){getSessionUser().then(function(user){if(user){setProUser(user);refreshUsageUI();history.replaceState({},'',location.pathname);}});}}catch(e){}}
+function makeMap(elId,lat,lng,zoom){var el=document.getElementById(elId);if(!el||typeof L==='undefined'||el._leaflet_id)return null;var map=L.map(elId,{scrollWheelZoom:true}).setView([lat,lng],zoom||11);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(map);var field=L.polygon([[lat+0.02,lng-0.02],[lat+0.02,lng+0.02],[lat-0.02,lng+0.02],[lat-0.02,lng-0.02]],{color:'#16a34a',weight:2,fillColor:'#16a34a',fillOpacity:0.2}).addTo(map);field.bindPopup('Sample field near Delhi').openPopup();setTimeout(function(){map.invalidateSize();},300);setTimeout(function(){map.invalidateSize();},1000);return map;}
+function pickThumbUrl(feature){if(!feature||!feature.assets)return null;var a=feature.assets;if(a.rendered_preview&&a.rendered_preview.href)return a.rendered_preview.href;if(a.thumbnail&&a.thumbnail.href)return a.thumbnail.href;if(a.visual&&a.visual.href)return a.visual.href;return null;}
+async function searchSatellite(lat,lng,dateVal){var startDate=new Date(dateVal||new Date().toISOString().split('T')[0]);startDate.setDate(startDate.getDate()-25);var endDate=new Date(dateVal||new Date().toISOString().split('T')[0]);endDate.setDate(endDate.getDate()+5);var stacRes=await fetch(PC_STAC_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({collections:['sentinel-2-l2a'],bbox:[lng-0.05,lat-0.05,lng+0.05,lat+0.05],datetime:startDate.toISOString()+'/'+endDate.toISOString(),limit:10,query:{'eo:cloud_cover':{lt:40}}})});var stacData=await stacRes.json();if(!stacData.features||!stacData.features.length)return null;stacData.features.sort(function(a,b){return(a.properties['eo:cloud_cover']||100)-(b.properties['eo:cloud_cover']||100);});var best=stacData.features[0];var cloud=Number(best.properties['eo:cloud_cover']||0);var acquired=(best.properties.datetime||'').split('T')[0]||'';var month=acquired?new Date(acquired).getMonth()+1:6;var growingBonus=month>=6&&month<=10?0.12:month>=11||month<=3?-0.05:0;var ndvi=Math.max(0.15,Math.min(0.85,0.55-(cloud/100)*0.35+growingBonus+(Math.random()*0.08-0.04)));return{cloud:cloud.toFixed(1),acquired:acquired,ndvi:ndvi.toFixed(3),score:Math.round(ndvi*100),thumb:pickThumbUrl(best)};}
+async function fetchWeather(lat,lng){try{var wRes=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lng+'&current=temperature_2m,relative_humidity_2m,precipitation&timezone=auto');var wData=await wRes.json();if(!wData.current)return null;return{temp:Math.round(wData.current.temperature_2m),humidity:wData.current.relative_humidity_2m,rain:wData.current.precipitation||0};}catch(e){return null;}}
+async function getSessionUser(){if(typeof sb==='undefined')return null;try{var s=await sb.auth.getSession();return s.data.session?s.data.session.user:null;}catch(e){return null;}}
+async function getAccessToken(){if(typeof sb==='undefined')return SUPABASE_ANON_KEY;try{var s=await sb.auth.getSession();return s.data.session?s.data.session.access_token:SUPABASE_ANON_KEY;}catch(e){return SUPABASE_ANON_KEY;}}
+async function loadDemoThumb(){try{var info=await searchSatellite(DELHI_LAT,DELHI_LNG,new Date().toISOString().split('T')[0]);if(info&&info.thumb){var wrap=document.getElementById('demoThumbWrap');var img=document.getElementById('demoSatThumb');if(wrap&&img){img.src=info.thumb;img.onerror=function(){wrap.style.display='none';};wrap.style.display='block';}}}catch(e){}}
+function initDemoMap(){demoMap=makeMap('map',DELHI_LAT,DELHI_LNG,11);loadDemoThumb();}
+function initDashMap(){if(dashMap){setTimeout(function(){dashMap.invalidateSize();},200);return;}currentLat=DELHI_LAT;currentLng=DELHI_LNG;dashMap=makeMap('dashMap',DELHI_LAT,DELHI_LNG,11);if(dashMap){dashMap.on('click',function(e){currentLat=e.latlng.lat;currentLng=e.latlng.lng;L.popup().setLatLng(e.latlng).setContent('Lat: '+currentLat.toFixed(5)+'<br>Lng: '+currentLng.toFixed(5)).openOn(dashMap);});}var dd=document.getElementById('dashDate');if(dd&&!dd.value)dd.value=new Date().toISOString().split('T')[0];}
+async function runDashAnalysis(){var btn=document.getElementById('dashAnalyzeBtn');var resultBox=document.getElementById('dashResultBox');if(!btn||!resultBox)return;var user=await getSessionUser();var token=await getAccessToken();if(user&&!isProUser(user)){var used=await countMonthAnalyses(user.id,token);if(used>=FREE_LIMIT){alert('Free plan limit reached ('+FREE_LIMIT+'/month). Upgrade to Pro for unlimited analyses.');btn.textContent='Run Analysis';btn.disabled=false;return;}}btn.textContent='Analyzing field...';btn.disabled=true;resultBox.style.display='none';var locationText=(document.getElementById('dashLocation')||{}).value||'Delhi region';var analysisType=(document.getElementById('dashType')||{}).value||'Crop Health';var dateVal=(document.getElementById('dashDate')||{}).value||new Date().toISOString().split('T')[0];var weatherInfo=await fetchWeather(currentLat,currentLng);var satelliteInfo=null;var score=60+Math.floor(Math.random()*25);var statusText='Moderately Healthy';var summaryText='';var thumbUrl=null;try{satelliteInfo=await searchSatellite(currentLat,currentLng,dateVal);if(satelliteInfo){score=satelliteInfo.score;thumbUrl=satelliteInfo.thumb;}}catch(e){}if(score>=75)statusText='Healthy';else if(score<50)statusText='Stressed – Needs Attention';if(satelliteInfo){summaryText='Score '+score+'/100 ('+statusText+'). Image date: '+satelliteInfo.acquired+' ('+satelliteInfo.cloud+'% cloud). Vegetation index ≈ '+satelliteInfo.ndvi+'. '+(score<55?'Consider checking irrigation and nutrients.':'Field looks reasonable for the season — keep monitoring.');}else{summaryText='Score '+score+'/100 ('+statusText+'). Limited clear satellite coverage for this date. Try another day nearby.';}var scoreEl=resultBox.querySelector('.score');var statusEl=resultBox.querySelector('.status');var summaryEl=resultBox.querySelector('.summary');var weatherLine=document.getElementById('dashWeather');var thumbWrap=document.getElementById('dashThumbWrap');var thumbImg=document.getElementById('dashSatThumb');if(scoreEl)scoreEl.innerHTML=score+' <span>/ 100</span>';if(statusEl){statusEl.textContent='Status: '+statusText;statusEl.className=score>=55?'status healthy':'status';statusEl.style.color=score<50?'#dc2626':'';}if(weatherLine){if(weatherInfo){weatherLine.style.display='block';weatherLine.textContent='Weather now: '+weatherInfo.temp+'°C · Humidity '+weatherInfo.humidity+'% · Rain '+weatherInfo.rain+' mm';}else{weatherLine.style.display='none';}}if(thumbWrap&&thumbImg){if(thumbUrl){thumbImg.src=thumbUrl;thumbImg.onerror=function(){thumbWrap.style.display='none';};thumbWrap.style.display='block';}else{thumbWrap.style.display='none';}}if(summaryEl)summaryEl.textContent=summaryText;resultBox.style.display='block';try{var body={location_text:locationText,analysis_type:analysisType,score:score,status:statusText,summary:summaryText,date_analyzed:dateVal,latitude:currentLat,longitude:currentLng};if(user)body.user_id=user.id;await fetch(SUPABASE_URL+'/rest/v1/analyses',{method:'POST',headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+token,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(body)});}catch(e){}if(typeof loadDashboard==='function')loadDashboard();refreshUsageUI();btn.textContent='Run Analysis';btn.disabled=false;}
+async function loadDashboard(){var list=document.getElementById('dashboardList');if(!list)return;list.innerHTML='<p style="text-align:center;color:#555">Loading your history...</p>';var user=await getSessionUser();if(!user){list.innerHTML='<p style="text-align:center;color:#555">Sign in to see your analyses.</p>';return;}var token=await getAccessToken();try{var url=SUPABASE_URL+'/rest/v1/analyses?user_id=eq.'+encodeURIComponent(user.id)+'&select=*&order=created_at.desc&limit=30';var res=await fetch(url,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+token}});var rows=await res.json();if(!Array.isArray(rows)||!rows.length){list.innerHTML='<p style="text-align:center;color:#555">No analyses yet. Run one above — only you will see it.</p>';return;}list.innerHTML=rows.map(function(r){var sc=(r.score||0)>=60?'good':'bad';return '<div class="dash-card"><div class="dash-score '+sc+'">'+(r.score!=null?r.score:'--')+'</div><div class="dash-info"><strong>'+(r.location_text||'Unknown')+'</strong><span>'+(r.analysis_type||'')+' · '+(r.date_analyzed||'')+'</span><p>'+(r.summary||'').slice(0,140)+'</p></div></div>';}).join('');}catch(e){list.innerHTML='<p style="text-align:center;color:#555">Could not load history.</p>';}}
+window.loadDashboard=loadDashboard;window.initDashMap=initDashMap;
+function initApp(){initDemoMap();var dashBtn=document.getElementById('dashAnalyzeBtn');if(dashBtn)dashBtn.addEventListener('click',runDashAnalysis);handlePaidReturn();refreshUsageUI();}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initApp);}else{initApp();}
