@@ -38,8 +38,8 @@
     <div class="container">
       <h2 class="section-title">Why AstraCropz</h2>
       <div class="features-grid">
-        <div class="feature-card"><div class="feature-icon">01</div><h3>Satellite imagery</h3><p>Fresh images from space for your fields</p></div>
-        <div class="feature-card"><div class="feature-icon">02</div><h3>Simple map</h3><p>Click any field and analyze in seconds</p></div>
+        <div class="feature-card"><div class="feature-icon">01</div><h3>Real vegetation score</h3><p>True crop greenness from satellite bands</p></div>
+        <div class="feature-card"><div class="feature-icon">02</div><h3>Vegetation map</h3><p>See healthy vs stressed zones on the map</p></div>
         <div class="feature-card"><div class="feature-icon">03</div><h3>Clear reports</h3><p>Health score, weather, and practical advice</p></div>
         <div class="feature-card"><div class="feature-icon">04</div><h3>Your history</h3><p>Past analyses saved only to your account</p></div>
       </div>
@@ -71,11 +71,18 @@
             <div class="score">72 <span>/ 100</span></div>
             <p class="status healthy">Status: Moderately Healthy</p>
             <div class="weather-line">Weather: warm · moderate humidity</div>
-            <div class="thumb-wrap" id="demoThumbWrap" style="display:none"><img id="demoSatThumb" alt="Satellite view of field" /><p class="thumb-cap">Satellite view</p></div>
+            <div class="thumb-wrap" id="demoThumbWrap" style="display:none"><img id="demoSatThumb" alt="Satellite view of field" /><p class="thumb-cap">Vegetation map (green = healthier)</p></div>
             <p class="summary">This is a demo of how AstraCropz reports look. Sign in to check your own fields with live satellite data, weather, and a personal history.</p>
           </div>
         </div>
-        <div class="tool-map" id="map"></div>
+        <div class="tool-map-wrap">
+          <div class="tool-map" id="map"></div>
+          <div class="ndvi-legend" id="demoLegend" style="display:none">
+            <span class="leg-low">Low</span>
+            <span class="leg-bar"></span>
+            <span class="leg-high">High vegetation</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -109,6 +116,7 @@
           <h3>Analyze a field</h3>
           <div class="form-group"><label>Location</label><input type="text" id="dashLocation" value="Delhi region"></div>
           <div class="form-group"><label>Date</label><input type="date" id="dashDate"></div>
+          <div class="form-group" id="date2Group" style="display:none"><label>Compare with</label><input type="date" id="dashDate2"></div>
           <div class="form-group"><label>Analysis type</label>
             <select id="dashType"><option>Crop Health</option><option>Change Detection</option><option>Water Stress</option></select>
           </div>
@@ -117,12 +125,20 @@
             <h4>Result</h4>
             <div class="score">-- <span>/ 100</span></div>
             <p class="status">Status: --</p>
+            <div class="weather-line" id="dashNdviLine" style="display:none"></div>
             <div class="weather-line" id="dashWeather" style="display:none"></div>
-            <div class="thumb-wrap" id="dashThumbWrap" style="display:none"><img id="dashSatThumb" alt="Satellite view" /><p class="thumb-cap">Satellite view</p></div>
+            <div class="thumb-wrap" id="dashThumbWrap" style="display:none"><img id="dashSatThumb" alt="Vegetation map" /><p class="thumb-cap">Vegetation map (green = healthier)</p></div>
             <p class="summary">--</p>
           </div>
         </div>
-        <div class="tool-map" id="dashMap"></div>
+        <div class="tool-map-wrap">
+          <div class="tool-map" id="dashMap"></div>
+          <div class="ndvi-legend" id="ndviLegend" style="display:none">
+            <span class="leg-low">Low</span>
+            <span class="leg-bar"></span>
+            <span class="leg-high">High vegetation</span>
+          </div>
+        </div>
       </div>
       <div id="dashboardList" class="dash-list" style="margin-top:36px"></div>
     </div>
