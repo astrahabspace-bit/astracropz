@@ -77,7 +77,7 @@ function switchAuthMode(m){
   var err=document.getElementById('authError'),ok=document.getElementById('authSuccess');
   if(err)err.style.display='none';if(ok)ok.style.display='none';
   if(m==='signin'){t.textContent='Sign In';b.textContent='Sign In';c.style.display='none';p.style.display='block';if(sub)sub.textContent='Welcome back';sw.innerHTML='No account? <a href="#" onclick="switchAuthMode(\'signup\');return false">Sign up</a>';}
-  else if(m==='signup'){t.textContent='Create Account';b.textContent='Sign Up';c.style.display='block';p.style.display='block';if(sub)sub.textContent='Start analyzing your fields';sw.innerHTML='Have an account? <a href="#" onclick="switchAuthMode(\'signin\');return false">Sign in</a>';}
+  else if(m==='signup'){t.textContent='Create Account';b.textContent='Sign Up';c.style.display='block';p.style.display='block';if(sub)sub.textContent='Start checking your fields';sw.innerHTML='Have an account? <a href="#" onclick="switchAuthMode(\'signin\');return false">Sign in</a>';}
   else{t.textContent='Reset Password';b.textContent='Send Link';c.style.display='none';p.style.display='none';if(sub)sub.textContent='We will email you a reset link';sw.innerHTML='<a href="#" onclick="switchAuthMode(\'signin\');return false">Back to Sign In</a>';}
 }
 
@@ -100,7 +100,7 @@ async function handleAuth(e){
     }else{
       var r3=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://astracropz.vercel.app'});
       if(r3.error){err.textContent=r3.error.message;err.style.display='block';return;}
-      document.getElementById('authSuccess').textContent='Reset link sent — check your inbox';
+      document.getElementById('authSuccess').textContent='Reset link sent. Check your inbox.';
       document.getElementById('authSuccess').style.display='block';
     }
   }catch(x){err.textContent='Something went wrong. Please try again.';err.style.display='block';}
@@ -122,11 +122,11 @@ function enterDashboard(user){
   var welcome=document.getElementById('welcomeTitle');
   var welcomeSub=document.getElementById('welcomeSub');
   if(welcome)welcome.textContent='Welcome, '+name;
-  if(welcomeSub)welcomeSub.textContent='Your crop health workspace';
+  if(welcomeSub)welcomeSub.textContent='Your field checks in one place';
 
   var se=document.getElementById('settingsEmail');
   var sn=document.getElementById('settingsName');
-  if(se)se.textContent=user.email||'—';
+  if(se)se.textContent=user.email||'-';
   if(sn)sn.textContent=name;
 
   var sideName=document.getElementById('sideUserName');
