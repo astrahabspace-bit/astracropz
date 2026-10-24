@@ -12,7 +12,6 @@
   <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 </head>
 <body>
-  <!-- Public marketing site -->
   <div id="publicSite">
     <nav class="nav">
       <div class="container nav-inner">
@@ -75,15 +74,13 @@
               <p class="status healthy">Status: Moderately Healthy</p>
               <div class="weather-line">Weather: warm · moderate humidity</div>
               <div class="thumb-wrap" id="demoThumbWrap" style="display:none"><img id="demoSatThumb" alt="Satellite view of field" /><p class="thumb-cap">Vegetation map (green = healthier)</p></div>
-              <p class="summary">This is a demo of how AstraCropz reports look. Sign in to check your own fields with live satellite data, weather, and a personal history.</p>
+              <p class="summary">This is a demo of how AstraCropz reports look. Sign in to check your own fields.</p>
             </div>
           </div>
           <div class="tool-map-wrap">
             <div class="tool-map" id="map"></div>
             <div class="ndvi-legend" id="demoLegend" style="display:none">
-              <span class="leg-low">Low</span>
-              <span class="leg-bar"></span>
-              <span class="leg-high">High vegetation</span>
+              <span class="leg-low">Low</span><span class="leg-bar"></span><span class="leg-high">High vegetation</span>
             </div>
           </div>
         </div>
@@ -118,25 +115,48 @@
     </footer>
   </div>
 
-  <!-- Dedicated app dashboard (after sign in) -->
-  <div id="appDashboard" style="display:none">
-    <nav class="nav dash-nav">
-      <div class="container nav-inner">
-        <a href="#" class="logo" onclick="showDashPanel('overview');return false">Astra<span>Cropz</span></a>
-        <div class="dash-nav-links" id="dashNavLinks">
-          <button type="button" class="dash-nav-btn active" data-panel="overview" onclick="showDashPanel('overview')">Overview</button>
-          <button type="button" class="dash-nav-btn" data-panel="analyze" onclick="showDashPanel('analyze')">New analysis</button>
-          <button type="button" class="dash-nav-btn" data-panel="history" onclick="showDashPanel('history')">My analyses</button>
-          <button type="button" class="dash-nav-btn" data-panel="settings" onclick="showDashPanel('settings')">Settings</button>
-        </div>
-        <button class="btn btn-sm btn-outline" onclick="signOut()">Sign Out</button>
+  <!-- App shell with left sidebar -->
+  <div id="appDashboard" class="dash-shell" style="display:none">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <a href="#" class="logo sidebar-logo" onclick="showDashPanel('overview');return false">Astra<span>Cropz</span></a>
+        <button type="button" class="sidebar-close" onclick="closeSidebar()" aria-label="Close menu">×</button>
       </div>
-    </nav>
+      <nav class="sidebar-nav">
+        <button type="button" class="side-link active" data-panel="overview" onclick="showDashPanel('overview')">
+          <span class="side-ico">⌂</span><span>Overview</span>
+        </button>
+        <button type="button" class="side-link" data-panel="analyze" onclick="showDashPanel('analyze')">
+          <span class="side-ico">◎</span><span>New analysis</span>
+        </button>
+        <button type="button" class="side-link" data-panel="history" onclick="showDashPanel('history')">
+          <span class="side-ico">☰</span><span>My analyses</span>
+        </button>
+        <button type="button" class="side-link" data-panel="settings" onclick="showDashPanel('settings')">
+          <span class="side-ico">⚙</span><span>Settings</span>
+        </button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="side-user">
+          <div class="side-avatar" id="sideAvatar">A</div>
+          <div class="side-user-meta">
+            <strong id="sideUserName">User</strong>
+            <span id="sideUserEmail">—</span>
+          </div>
+        </div>
+        <button type="button" class="side-signout" onclick="signOut()">Sign out</button>
+      </div>
+    </aside>
 
-    <main class="dash-main">
-      <!-- Overview -->
-      <section id="panel-overview" class="dash-panel">
-        <div class="container">
+    <div class="dash-content">
+      <header class="dash-topbar">
+        <button type="button" class="menu-toggle" onclick="openSidebar()" aria-label="Open menu">☰</button>
+        <h2 class="dash-page-title" id="dashPageTitle">Overview</h2>
+      </header>
+
+      <main class="dash-main">
+        <section id="panel-overview" class="dash-panel">
           <div class="dash-welcome">
             <h1 id="welcomeTitle">Welcome</h1>
             <p id="welcomeSub">Your crop health workspace</p>
@@ -162,17 +182,11 @@
             <button class="btn" type="button" onclick="showDashPanel('analyze')">New analysis</button>
             <button class="btn btn-outline" type="button" onclick="showDashPanel('history')">View history</button>
           </div>
-          <div class="dash-tip">
-            <strong>Tip:</strong> Click the map to place your field, pick a date, then run analysis for a clear health score and vegetation map.
-          </div>
+          <div class="dash-tip"><strong>Tip:</strong> Click the map to place your field, pick a date, then run analysis.</div>
           <div id="overviewRecent" class="overview-recent"></div>
-        </div>
-      </section>
+        </section>
 
-      <!-- New analysis -->
-      <section id="panel-analyze" class="dash-panel" style="display:none">
-        <div class="container">
-          <h2 class="dash-panel-title">New analysis</h2>
+        <section id="panel-analyze" class="dash-panel" style="display:none">
           <p class="usage-line" id="usageLine" style="display:none"></p>
           <div class="tool-wrapper dash-tool">
             <div class="tool-sidebar">
@@ -201,60 +215,48 @@
             <div class="tool-map-wrap">
               <div class="tool-map" id="dashMap"></div>
               <div class="ndvi-legend" id="ndviLegend" style="display:none">
-                <span class="leg-low">Low</span>
-                <span class="leg-bar"></span>
-                <span class="leg-high">High vegetation</span>
+                <span class="leg-low">Low</span><span class="leg-bar"></span><span class="leg-high">High vegetation</span>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- History -->
-      <section id="panel-history" class="dash-panel" style="display:none">
-        <div class="container">
-          <h2 class="dash-panel-title">My analyses</h2>
+        <section id="panel-history" class="dash-panel" style="display:none">
           <p class="dash-sub">Only your own crop checks are shown here</p>
           <div id="dashboardList" class="dash-list"></div>
-        </div>
-      </section>
+        </section>
 
-      <!-- Settings -->
-      <section id="panel-settings" class="dash-panel" style="display:none">
-        <div class="container" style="max-width:560px">
-          <h2 class="dash-panel-title">Settings</h2>
-          <div class="settings-card">
-            <h3>Account</h3>
-            <p class="settings-row"><span>Email</span><strong id="settingsEmail">—</strong></p>
-            <p class="settings-row"><span>Display name</span><strong id="settingsName">—</strong></p>
-            <button class="btn btn-outline btn-sm" type="button" onclick="openAuthModal('forgot')">Reset password</button>
-          </div>
-          <div class="settings-card">
-            <h3>Plan</h3>
-            <p class="settings-row"><span>Current plan</span><strong id="settingsPlan">Free</strong></p>
-            <p class="settings-hint" id="settingsPlanHint">5 analyses per month on Free.</p>
-            <div class="pricing-grid" style="max-width:100%;margin-top:16px">
-              <div class="price-card">
-                <h3>Free</h3>
-                <div class="price">₹0<span>/month</span></div>
-                <ul><li>5 analyses / month</li><li>Basic crop health</li><li>Clear summaries</li></ul>
-              </div>
-              <div class="price-card featured">
-                <div class="popular">Popular</div>
-                <h3>Pro</h3>
-                <div class="price">₹799<span>/month</span></div>
-                <ul><li>Unlimited analyses</li><li>Change detection</li><li>Priority support</li></ul>
-                <button class="btn btn-full" type="button" onclick="startProCheckout()">Get Pro</button>
+        <section id="panel-settings" class="dash-panel" style="display:none">
+          <div class="settings-wrap">
+            <div class="settings-card">
+              <h3>Account</h3>
+              <p class="settings-row"><span>Email</span><strong id="settingsEmail">—</strong></p>
+              <p class="settings-row"><span>Display name</span><strong id="settingsName">—</strong></p>
+              <button class="btn btn-outline btn-sm" type="button" onclick="openAuthModal('forgot')">Reset password</button>
+            </div>
+            <div class="settings-card">
+              <h3>Plan</h3>
+              <p class="settings-row"><span>Current plan</span><strong id="settingsPlan">Free</strong></p>
+              <p class="settings-hint" id="settingsPlanHint">5 analyses per month on Free.</p>
+              <div class="pricing-grid settings-pricing">
+                <div class="price-card">
+                  <h3>Free</h3>
+                  <div class="price">₹0<span>/month</span></div>
+                  <ul><li>5 analyses / month</li><li>Basic crop health</li><li>Clear summaries</li></ul>
+                </div>
+                <div class="price-card featured">
+                  <div class="popular">Popular</div>
+                  <h3>Pro</h3>
+                  <div class="price">₹799<span>/month</span></div>
+                  <ul><li>Unlimited analyses</li><li>Change detection</li><li>Priority support</li></ul>
+                  <button class="btn btn-full" type="button" onclick="startProCheckout()">Get Pro</button>
+                </div>
               </div>
             </div>
           </div>
-          <div class="settings-card">
-            <h3>Session</h3>
-            <button class="btn btn-outline" type="button" onclick="signOut()">Sign out</button>
-          </div>
-        </div>
-      </section>
-    </main>
+        </section>
+      </main>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
