@@ -31,6 +31,70 @@ window.showDashPanel=showDashPanel;
 
 function makeMap(elId,lat,lng,zoom){var el=document.getElementById(elId);if(!el||typeof L==='undefined'||el._leaflet_id)return null;var map=L.map(elId,{scrollWheelZoom:true}).setView([lat,lng],zoom||12);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(map);setTimeout(function(){map.invalidateSize();},300);setTimeout(function(){map.invalidateSize();},1000);return map;}
 function fieldBbox(lat,lng,half){half=half||0.02;return[lng-half,lat-half,lng+half,lat+half];}
+async function reverseGeocode(lat,lng){
+  try{
+    var url='https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=12&addressdetails=0';
+    var res=await fetch(url,{headers:{'Accept':'application/json'}});
+    if(!res.ok)return null;
+    var data=await res.json();
+    if(data&&data.display_name){
+      var parts=String(data.display_name).split(',').map(function(s){return s.trim();}).filter(Boolean);
+      return parts.slice(0,3).join(', ');
+    }
+  }catch(e){}
+  return null;
+}
+async function forwardGeocode(query){
+  try{
+    var q=String(query||'').trim();
+    if(!q||q.length<2)return null;
+    var url='https://nominatim.openstreetmap.org/search?format=json&q='+encodeURIComponent(q)+'&limit=1&countrycodes=in';
+    var res=await fetch(url,{headers:{'Accept':'application/json'}});
+    if(!res.ok)return null;
+    var data=await res.json();
+    if(data&&data[0])return{lat:parseFloat(data[0].lat),lng:parseFloat(data[0].lon),label:data[0].display_name};
+  }catch(e){}
+  return null;
+}
+function setLocationInput(text){
+  var el=document.getElementById('dashLocation');
+  if(el&&text)el.value=text;
+}
+async function onMapPick(lat,lng){
+  currentLat=lat;currentLng=lng;
+  if(dashMap){
+    setFieldMarker(dashMap,lat,lng);
+    try{dashMap.flyTo([lat,lng],Math.max(dashMap.getZoom(),13),{duration:0.6});}catch(e){dashMap.setView([lat,lng],13);}
+  }
+  setLocationInput(lat.toFixed(4)+', '+lng.toFixed(4)+' (loading name...)');
+  var name=await reverseGeocode(lat,lng);
+  if(name)setLocationInput(name);
+  else setLocationInput(lat.toFixed(4)+', '+lng.toFixed(4));
+}
+async function onLocationSearch(){
+  var el=document.getElementById('dashLocation');
+  if(!el)return;
+  var q=el.value.trim();
+  if(!q)return;
+  var m=q.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)/);
+  if(m){
+    await onMapPick(parseFloat(m[1]),parseFloat(m[2]));
+    return;
+  }
+  el.value='Searching...';
+  var hit=await forwardGeocode(q);
+  if(hit){
+    currentLat=hit.lat;currentLng=hit.lng;
+    if(dashMap){
+      setFieldMarker(dashMap,hit.lat,hit.lng);
+      try{dashMap.flyTo([hit.lat,hit.lng],13,{duration:0.6});}catch(e){dashMap.setView([hit.lat,hit.lng],13);}
+    }
+    var short=String(hit.label||q).split(',').slice(0,3).join(',').trim();
+    el.value=short||q;
+  }else{
+    el.value=q;
+  }
+}
 function ndviToScore(mean){if(mean==null||isNaN(mean))return null;var s=Math.round(((mean+0.05)/0.85)*100);return Math.max(0,Math.min(100,s));}
 function statusFromNdvi(mean){if(mean==null)return{text:'Unknown',cls:''};if(mean>=0.55)return{text:'Healthy',cls:'healthy'};if(mean>=0.35)return{text:'Moderately Healthy',cls:'healthy'};if(mean>=0.2)return{text:'Fair - Monitor',cls:''};return{text:'Stressed - Needs Attention',cls:''};}
 function buildAdvice(mean,weather,analysisType,changeDelta){var lines=[];if(mean!=null){if(mean>=0.55)lines.push('Crop looks strong on this pass. Keep checking as usual.');else if(mean>=0.35)lines.push('Moderate green cover. Check soil moisture and nutrition this week.');else if(mean>=0.2)lines.push('Green cover looks low. Check for water stress, pests, or missing nutrients.');else lines.push('Low green signal. Walk the field and review irrigation and recent sprays.');}if(weather){if(weather.rain>2)lines.push('Rain may make field access harder and raise disease risk.');else if(weather.humidity>80&&weather.temp>28)lines.push('Warm and humid. Watch for fungal issues on leafy crops.');else if(weather.temp>38)lines.push('High heat. Protect young plants and avoid mid-day stress.');else if(weather.humidity<30)lines.push('Dry air. Irrigation timing matters more this week.');}if(analysisType==='Water Stress'&&mean!=null&&mean<0.4)lines.push('Water stress looks likely. Review irrigation soon.');if(analysisType==='Change Detection'&&changeDelta!=null){if(changeDelta>0.08)lines.push('Green cover improved vs the earlier date. Growth or recovery looks good.');else if(changeDelta<-0.08)lines.push('Green cover dropped vs the earlier date. Check for stress or harvest activity.');else lines.push('Little change between the two dates. Field looks stable.');}if(!lines.length)lines.push('Report ready. Use the map to see healthier (green) and weaker (yellow or red) zones.');return lines.join(' ');}
@@ -47,7 +111,7 @@ async function getSessionUser(){if(typeof sb==='undefined')return null;try{var s
 async function getAccessToken(){if(typeof sb==='undefined')return SUPABASE_ANON_KEY;try{var s=await sb.auth.getSession();return s.data.session?s.data.session.access_token:SUPABASE_ANON_KEY;}catch(e){return SUPABASE_ANON_KEY;}}
 async function loadDemoThumb(){try{var info=await searchSatellite(DELHI_LAT,DELHI_LNG,new Date().toISOString().split('T')[0]);if(!info)return;var wrap=document.getElementById('demoThumbWrap');var img=document.getElementById('demoSatThumb');if(wrap&&img){img.src=info.ndviPreview||info.thumb;img.onerror=function(){if(info.thumb&&img.src!==info.thumb)img.src=info.thumb;else wrap.style.display='none';};wrap.style.display='block';}var scoreEl=document.querySelector('#resultBox .score');var statusEl=document.querySelector('#resultBox .status');var summaryEl=document.querySelector('#resultBox .summary');var st=statusFromNdvi(info.ndviMean);if(scoreEl&&info.score!=null)scoreEl.innerHTML=info.score+' <span>/ 100</span>';if(statusEl){statusEl.textContent='Status: '+st.text;statusEl.className='status '+st.cls;}if(summaryEl&&info.ndvi!=null)summaryEl.textContent='Sample field near Delhi. Vegetation index about '+info.ndvi+' from image '+info.acquired+' ('+info.cloud+'% cloud). Sign in to check your own fields.';if(demoMap&&info.itemId){setNdviOverlay(demoMap,info.itemId);setFieldMarker(demoMap,DELHI_LAT,DELHI_LNG);var leg=document.getElementById('demoLegend');if(leg)leg.style.display='flex';}}catch(e){}}
 function initDemoMap(){demoMap=makeMap('map',DELHI_LAT,DELHI_LNG,12);setFieldMarker(demoMap,DELHI_LAT,DELHI_LNG);loadDemoThumb();}
-function initDashMap(){if(dashMap){setTimeout(function(){dashMap.invalidateSize();},200);return;}currentLat=DELHI_LAT;currentLng=DELHI_LNG;dashMap=makeMap('dashMap',DELHI_LAT,DELHI_LNG,12);if(dashMap){dashMap.on('click',function(e){currentLat=e.latlng.lat;currentLng=e.latlng.lng;setFieldMarker(dashMap,currentLat,currentLng);});setFieldMarker(dashMap,currentLat,currentLng);}var dd=document.getElementById('dashDate');if(dd&&!dd.value)dd.value=new Date().toISOString().split('T')[0];var dd2=document.getElementById('dashDate2');if(dd2&&!dd2.value){var d=new Date();d.setDate(d.getDate()-20);dd2.value=d.toISOString().split('T')[0];}}
+function initDashMap(){if(dashMap){setTimeout(function(){dashMap.invalidateSize();},200);return;}currentLat=DELHI_LAT;currentLng=DELHI_LNG;dashMap=makeMap('dashMap',DELHI_LAT,DELHI_LNG,12);if(dashMap){dashMap.on('click',function(e){onMapPick(e.latlng.lat,e.latlng.lng);});setFieldMarker(dashMap,currentLat,currentLng);}var dd=document.getElementById('dashDate');if(dd&&!dd.value)dd.value=new Date().toISOString().split('T')[0];var dd2=document.getElementById('dashDate2');if(dd2&&!dd2.value){var d=new Date();d.setDate(d.getDate()-20);dd2.value=d.toISOString().split('T')[0];}var loc=document.getElementById('dashLocation');if(loc&&!loc._bound){loc._bound=true;loc.addEventListener('keydown',function(ev){if(ev.key==='Enter'){ev.preventDefault();onLocationSearch();}});loc.addEventListener('change',function(){onLocationSearch();});}}
 function toggleChangeDates(){var typeEl=document.getElementById('dashType');var group=document.getElementById('date2Group');if(!typeEl||!group)return;group.style.display=typeEl.value==='Change Detection'?'block':'none';}
 async function runDashAnalysis(){var btn=document.getElementById('dashAnalyzeBtn');var resultBox=document.getElementById('dashResultBox');if(!btn||!resultBox)return;var user=await getSessionUser();var token=await getAccessToken();if(user&&!isProUser(user)){var used=await countMonthAnalyses(user.id,token);if(used>=FREE_LIMIT){alert('Free plan limit reached ('+FREE_LIMIT+'/month). Upgrade to Pro for unlimited checks.');return;}}btn.textContent='Analyzing field...';btn.disabled=true;resultBox.style.display='none';var locationText=(document.getElementById('dashLocation')||{}).value||'Delhi region';var analysisType=(document.getElementById('dashType')||{}).value||'Crop Health';var dateVal=(document.getElementById('dashDate')||{}).value||new Date().toISOString().split('T')[0];var dateVal2=(document.getElementById('dashDate2')||{}).value||'';var weatherInfo=await fetchWeather(currentLat,currentLng);var satelliteInfo=null;var score=null;var statusText='Unknown';var statusCls='';var summaryText='';var thumbUrl=null;var changeDelta=null;try{satelliteInfo=await searchSatellite(currentLat,currentLng,dateVal);if(satelliteInfo){score=satelliteInfo.score;thumbUrl=satelliteInfo.ndviPreview||satelliteInfo.thumb;var st=statusFromNdvi(satelliteInfo.ndviMean);statusText=st.text;statusCls=st.cls;if(dashMap&&satelliteInfo.itemId){setNdviOverlay(dashMap,satelliteInfo.itemId);setFieldMarker(dashMap,currentLat,currentLng);}if(analysisType==='Change Detection'&&dateVal2&&satelliteInfo.ndviMean!=null){var older=await searchSatellite(currentLat,currentLng,dateVal2);if(older&&older.ndviMean!=null)changeDelta=satelliteInfo.ndviMean-older.ndviMean;}summaryText='Vegetation index about '+satelliteInfo.ndvi+' from image '+satelliteInfo.acquired+' ('+satelliteInfo.cloud+'% cloud). ';if(changeDelta!=null)summaryText+='Change vs compare date: '+(changeDelta>0?'+':'')+changeDelta.toFixed(3)+'. ';summaryText+=buildAdvice(satelliteInfo.ndviMean,weatherInfo,analysisType,changeDelta);}else{score=55;statusText='Limited coverage';summaryText='Could not get a clear reading for this date. Try another day with less cloud, or move the field marker a bit.';}}catch(e){score=55;statusText='Limited coverage';summaryText='Could not finish the check right now. Please try again in a moment.';}var scoreEl=resultBox.querySelector('.score');var statusEl=resultBox.querySelector('.status');var summaryEl=resultBox.querySelector('.summary');var weatherLine=document.getElementById('dashWeather');var thumbWrap=document.getElementById('dashThumbWrap');var thumbImg=document.getElementById('dashSatThumb');var ndviLine=document.getElementById('dashNdviLine');var legend=document.getElementById('ndviLegend');if(scoreEl)scoreEl.innerHTML=(score!=null?score:'--')+' <span>/ 100</span>';if(statusEl){statusEl.textContent='Status: '+statusText;statusEl.className='status '+statusCls;statusEl.style.color=(score!=null&&score<50)?'#dc2626':'';}if(ndviLine){if(satelliteInfo&&satelliteInfo.ndvi!=null){ndviLine.style.display='block';ndviLine.textContent='Vegetation index: '+satelliteInfo.ndvi+(satelliteInfo.ndviStats?'  ·  range '+Number(satelliteInfo.ndviStats.min).toFixed(2)+' to '+Number(satelliteInfo.ndviStats.max).toFixed(2):'');}else{ndviLine.style.display='none';}}if(weatherLine){if(weatherInfo){weatherLine.style.display='block';weatherLine.textContent='Weather now: '+weatherInfo.temp+'°C · Humidity '+weatherInfo.humidity+'% · Rain '+weatherInfo.rain+' mm';}else{weatherLine.style.display='none';}}if(thumbWrap&&thumbImg){if(thumbUrl){thumbImg.src=thumbUrl;thumbImg.onerror=function(){thumbWrap.style.display='none';};thumbWrap.style.display='block';}else{thumbWrap.style.display='none';}}if(legend)legend.style.display=(satelliteInfo&&satelliteInfo.itemId)?'flex':'none';if(summaryEl)summaryEl.textContent=summaryText;resultBox.style.display='block';try{var body={location_text:locationText,analysis_type:analysisType,score:score,status:statusText,summary:summaryText,date_analyzed:dateVal,latitude:currentLat,longitude:currentLng};if(user)body.user_id=user.id;await fetch(SUPABASE_URL+'/rest/v1/analyses',{method:'POST',headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+token,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(body)});}catch(e){}if(typeof loadDashboard==='function')loadDashboard();refreshUsageUI();btn.textContent='Run Analysis';btn.disabled=false;}
 async function loadDashboard(){var list=document.getElementById('dashboardList');var overview=document.getElementById('overviewRecent');var statLast=document.getElementById('statLast');var user=await getSessionUser();if(!user){if(list)list.innerHTML='<p class="empty-msg">Sign in to see your checks.</p>';if(overview)overview.innerHTML='';return;}if(list)list.innerHTML='<p class="empty-msg">Loading your history...</p>';var token=await getAccessToken();try{var url=SUPABASE_URL+'/rest/v1/analyses?user_id=eq.'+encodeURIComponent(user.id)+'&select=*&order=created_at.desc&limit=30';var res=await fetch(url,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+token}});var rows=await res.json();if(!Array.isArray(rows)||!rows.length){if(list)list.innerHTML='<p class="empty-msg">No checks yet. Run one from New analysis. Only you will see it.</p>';if(overview)overview.innerHTML='<p class="empty-msg">No recent checks. Start with a new field check.</p>';if(statLast)statLast.textContent='None yet';return;}if(statLast)statLast.textContent=(rows[0].location_text||'Field').slice(0,18);var cards=rows.map(function(r){var sc=(r.score||0)>=60?'good':'bad';return '<div class="dash-card"><div class="dash-score '+sc+'">'+(r.score!=null?r.score:'--')+'</div><div class="dash-info"><strong>'+(r.location_text||'Unknown')+'</strong><span>'+(r.analysis_type||'')+' · '+(r.date_analyzed||'')+'</span><p>'+(r.summary||'').slice(0,160)+'</p></div></div>';}).join('');if(list)list.innerHTML=cards;if(overview)overview.innerHTML='<h3 class="overview-recent-title">Recent</h3>'+rows.slice(0,3).map(function(r){var sc=(r.score||0)>=60?'good':'bad';return '<div class="dash-card"><div class="dash-score '+sc+'">'+(r.score!=null?r.score:'--')+'</div><div class="dash-info"><strong>'+(r.location_text||'Unknown')+'</strong><span>'+(r.analysis_type||'')+' · '+(r.date_analyzed||'')+'</span></div></div>';}).join('');}catch(e){if(list)list.innerHTML='<p class="empty-msg">Could not load history.</p>';}}
