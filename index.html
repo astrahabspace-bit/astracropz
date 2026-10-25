@@ -258,6 +258,21 @@
     </div>
   </div>
 
+  <div id="quotaModal" class="quota-modal" style="display:none" role="dialog" aria-modal="true">
+    <div class="quota-overlay" onclick="closeQuotaModal()"></div>
+    <div class="quota-box">
+      <button type="button" class="quota-close" onclick="closeQuotaModal()" aria-label="Close">×</button>
+      <div class="quota-icon">5</div>
+      <h2>Free checks used up</h2>
+      <p class="quota-text">You have used all 5 free checks for this month. Upgrade to Pro for unlimited field checks, or wait until next month.</p>
+      <div class="quota-actions">
+        <button type="button" class="btn btn-full" onclick="closeQuotaModal();startProCheckout();">Get Pro (₹799/month)</button>
+        <button type="button" class="btn btn-outline btn-full" onclick="closeQuotaModal()">Maybe later</button>
+      </div>
+      <p class="quota-note">Your past reports stay in My analyses.</p>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="auth.js"></script>
