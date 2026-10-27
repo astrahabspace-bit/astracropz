@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shared crop report — AstraCropz</title>
+  <meta name="description" content="Shared crop health report from AstraCropz.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="logo">Astra<span>Cropz</span></a>
+      <a class="btn btn-sm btn-outline" href="/">Home</a>
+    </div>
+  </nav>
+  <main class="report-page">
+    <div class="report-card" id="reportCard">
+      <h1 style="font-size:1.2rem;margin-bottom:8px">Crop health report</h1>
+      <p class="blog-meta" id="rLoc">Loading…</p>
+      <div class="score-wrap" style="margin-top:16px">
+        <div class="score" id="rScore">-- <span>/ 100</span></div>
+        <p class="score-meaning" id="rMeaning"></p>
+      </div>
+      <p class="status" id="rStatus"></p>
+      <p class="summary" id="rSummary" style="margin-top:12px"></p>
+      <p class="result-foot" id="rMeta"></p>
+      <div class="report-actions">
+        <button type="button" class="btn btn-outline btn-sm" onclick="window.print()">Print / PDF</button>
+        <a class="btn btn-sm" href="/">Open AstraCropz</a>
+      </div>
+    </div>
+  </main>
+  <script>
+  (function(){
+    function qs(name){return new URL(location.href).searchParams.get(name);}
+    try{
+      var raw=qs('r');
+      if(!raw){document.getElementById('rLoc').textContent='No report data in this link.';return;}
+      var json=decodeURIComponent(escape(atob(raw)));
+      var d=JSON.parse(json);
+      document.getElementById('rLoc').textContent=(d.l||'Field')+(d.d?(' · '+d.d):'');
+      document.getElementById('rScore').innerHTML=(d.s!=null?d.s:'--')+' <span>/ 100</span>';
+      document.getElementById('rMeaning').textContent=d.m||'';
+      document.getElementById('rStatus').textContent=d.st?('Status: '+d.st):'';
+      document.getElementById('rSummary').textContent=d.sum||'';
+      var meta=[];
+      if(d.c)meta.push('Crop: '+d.c);
+      if(d.w)meta.push('Weather: '+d.w);
+      document.getElementById('rMeta').textContent=meta.join(' · ')||'Shared from AstraCropz';
+      document.title=(d.l||'Field')+' — score '+(d.s!=null?d.s:'--')+' | AstraCropz';
+    }catch(e){
+      document.getElementById('rLoc').textContent='This report link is invalid or expired.';
+    }
+  })();
+  </script>
+</body>
+</html>
