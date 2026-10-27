@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AstraCropz - Crop health from space</title>
-  <meta name="description" content="Check crop health with satellite images. Built in India for farms and agri businesses.">
+  <title>AstraCropz — Crop health from space for Indian farms</title>
+  <meta name="description" content="Check crop health with a simple score from satellite images. Built in India for farms and FPOs.">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://astracropz.vercel.app/">
+  <meta property="og:title" content="AstraCropz — Crop health from space">
+  <meta property="og:description" content="Simple crop health scores for Indian farms and FPOs.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -21,6 +25,8 @@
           <a href="#how">How it works</a>
           <a href="#tool">Demo</a>
           <a href="#pricing">Pricing</a>
+          <a href="blog/">Blog</a>
+          <a href="about.html">About</a>
         </div>
         <button class="btn btn-sm btn-outline" id="signInBtn" onclick="openAuthModal('signin')">Sign In</button>
       </div>
@@ -70,23 +76,15 @@
             <button class="btn btn-full btn-outline" type="button" onclick="openAuthModal('signup')">Sign in to analyze</button>
             <div class="result-box" id="resultBox">
               <h4>Sample result</h4>
-              <div class="score-wrap">
-                <div class="score">72 <span>/ 100</span></div>
-                <p class="score-meaning" id="demoScoreMeaning">Crop looks okay</p>
-              </div>
+              <div class="score-wrap"><div class="score">72 <span>/ 100</span></div><p class="score-meaning" id="demoScoreMeaning">Crop looks okay</p></div>
               <p class="status healthy">Status: Moderately Healthy</p>
-              <div class="compare-line" id="demoCompareLine">Unlike a photo on Google, this is a scored check you can save and compare later.</div>
+              <div class="compare-line">Unlike a photo on Google, this is a scored check you can save and compare later.</div>
               <div class="weather-line">Weather: warm · moderate humidity</div>
               <div class="thumb-wrap" id="demoThumbWrap" style="display:none"><img id="demoSatThumb" alt="Field view" /><p class="thumb-cap">Green looks healthier · yellow or red looks weaker</p></div>
-              <p class="summary">This is a sample of what a report looks like. Sign in to check your own fields and keep history.</p>
+              <p class="summary">Sample report. Sign in to check your own fields and keep history.</p>
             </div>
           </div>
-          <div class="tool-map-wrap">
-            <div class="tool-map" id="map"></div>
-            <div class="ndvi-legend" id="demoLegend" style="display:none">
-              <span class="leg-low">Low</span><span class="leg-bar"></span><span class="leg-high">High vegetation</span>
-            </div>
-          </div>
+          <div class="tool-map-wrap"><div class="tool-map" id="map"></div></div>
         </div>
       </div>
     </section>
@@ -94,136 +92,87 @@
       <div class="container">
         <h2 class="section-title">Pricing</h2>
         <div class="pricing-grid">
-          <div class="price-card">
-            <h3>Free</h3>
-            <div class="price">₹0<span>/month</span></div>
-            <ul><li>5 checks per month</li><li>Basic crop health</li><li>Short summaries</li></ul>
-            <button class="btn btn-outline btn-full" onclick="openAuthModal('signup')">Start free</button>
-          </div>
-          <div class="price-card featured">
-            <div class="popular">Popular</div>
-            <h3>Pro</h3>
-            <div class="price">₹799<span>/month</span></div>
-            <ul><li>Unlimited checks</li><li>Change detection</li><li>Priority support</li></ul>
-            <button class="btn btn-full" onclick="openAuthModal('signup')">Get Pro</button>
-          </div>
+          <div class="price-card"><h3>Free</h3><div class="price">₹0<span>/month</span></div><ul><li>5 checks per month</li><li>Basic crop health</li><li>Short summaries</li></ul><button class="btn btn-outline btn-full" onclick="openAuthModal('signup')">Start free</button></div>
+          <div class="price-card featured"><div class="popular">Popular</div><h3>Pro</h3><div class="price">₹799<span>/month</span></div><ul><li>Unlimited checks</li><li>Change detection</li><li>Priority support</li></ul><button class="btn btn-full" onclick="openAuthModal('signup')">Get Pro</button></div>
         </div>
       </div>
     </section>
-    <footer class="footer">
-      <div class="container">
-        <p>© 2026 AstraCropz · Built in India</p>
+    <section id="about-teaser" class="section">
+      <div class="container about-wrap">
+        <h2 class="section-title">Why we built this</h2>
+        <p>AstraCropz was started by Shantanu Dutta in Prayagraj. Farms and FPOs should get a clear crop health score from space, without expensive tools.</p>
+        <p>It sits under Astrahab — a longer path toward space systems that help people on the ground.</p>
+        <p><a href="about.html" class="btn btn-outline">Read about the founder</a></p>
       </div>
-    </footer>
+    </section>
+    <footer class="footer"><div class="container"><p>© 2026 AstraCropz · Built in India · <a href="about.html">About</a> · <a href="blog/">Blog</a></p></div></footer>
   </div>
 
   <div id="appDashboard" style="display:none">
     <div class="dash-shell">
       <aside class="sidebar" id="sidebar">
-        <div class="side-brand">
-          <a href="/" class="logo">Astra<span>Cropz</span></a>
-        </div>
+        <div class="side-brand"><a href="/" class="logo">Astra<span>Cropz</span></a></div>
         <nav class="side-nav">
           <button type="button" class="side-link active" data-panel="overview" onclick="showDashPanel('overview')">Overview</button>
           <button type="button" class="side-link" data-panel="analyze" onclick="showDashPanel('analyze')">New analysis</button>
           <button type="button" class="side-link" data-panel="history" onclick="showDashPanel('history')">My analyses</button>
+          <button type="button" class="side-link" data-panel="fields" onclick="showDashPanel('fields')">Saved fields</button>
           <button type="button" class="side-link" data-panel="settings" onclick="showDashPanel('settings')">Settings</button>
         </nav>
-        <div class="side-foot">
-          <p id="usageLine" class="usage-line" style="display:none"></p>
-          <button type="button" class="btn btn-outline btn-sm btn-full" onclick="signOutUser()">Sign out</button>
-        </div>
+        <div class="side-foot"><p id="usageLine" class="usage-line" style="display:none"></p><button type="button" class="btn btn-outline btn-sm btn-full" onclick="signOutUser()">Sign out</button></div>
       </aside>
       <main class="dash-main">
-        <header class="dash-top">
-          <button type="button" class="side-toggle" onclick="toggleSidebar()" aria-label="Menu">☰</button>
-          <h1 id="dashPageTitle">Overview</h1>
-          <div class="dash-user" id="dashWelcome">Welcome</div>
-        </header>
-
+        <header class="dash-top"><button type="button" class="side-toggle" onclick="toggleSidebar()" aria-label="Menu">☰</button><h1 id="dashPageTitle">Overview</h1><div class="dash-user" id="dashWelcome">Welcome</div></header>
         <section id="panel-overview" class="dash-panel">
+          <div id="scoreAlert" class="alert-banner empty">Run a few checks to see if any field score drops.</div>
           <div class="stat-grid">
             <div class="stat-card"><span class="stat-label">This month</span><strong id="statMonth">0</strong><span class="stat-hint">checks used</span></div>
             <div class="stat-card"><span class="stat-label">Left</span><strong id="statLeft">5</strong><span class="stat-hint" id="statLeftHint">free checks left</span></div>
             <div class="stat-card"><span class="stat-label">Last field</span><strong id="statLast">None yet</strong><span class="stat-hint">most recent</span></div>
           </div>
           <div id="overviewRecent"></div>
-          <div class="overview-actions">
-            <button class="btn" type="button" onclick="showDashPanel('analyze')">New analysis</button>
-            <button class="btn btn-outline" type="button" onclick="showDashPanel('history')">View history</button>
-          </div>
+          <div class="overview-actions"><button class="btn" type="button" onclick="showDashPanel('analyze')">New analysis</button><button class="btn btn-outline" type="button" onclick="showDashPanel('history')">View history</button></div>
         </section>
-
         <section id="panel-analyze" class="dash-panel" style="display:none">
           <div class="tool-wrapper dash-tool">
             <div class="tool-sidebar">
               <h3>Check a field</h3>
-              <div class="form-group"><label>Field location</label><input type="text" id="dashLocation" value="Delhi region" placeholder="Click map or type a place"><p class="field-hint">Click the map to pick your field</p></div>
+              <div class="form-group"><label>Saved fields</label><div class="field-list" id="savedFieldList"><p class="field-hint">No saved fields yet</p></div></div>
+              <div class="form-group"><label>Field location</label><input type="text" id="dashLocation" value="Delhi region" placeholder="Click map or type a place"><p class="field-hint">Click the map to pick your field</p>
+                <div class="field-save-row"><input type="text" id="fieldNameInput" placeholder="Name e.g. Plot 3 North"><button type="button" class="btn btn-outline btn-sm" onclick="saveCurrentField()">Save</button></div>
+              </div>
+              <div class="form-group"><label>Crop type</label><select id="dashCrop"><option value="">Not set</option><option>Wheat</option><option>Paddy</option><option>Vegetables</option><option>Pulses</option><option>Cotton</option><option>Sugarcane</option><option>Other</option></select></div>
               <div class="form-group"><label>Date</label><input type="date" id="dashDate"></div>
               <div class="form-group" id="date2Group" style="display:none"><label>Compare with</label><input type="date" id="dashDate2"></div>
-              <div class="form-group"><label>Type</label>
-                <select id="dashType">
-                  <option>Crop Health</option>
-                  <option>Change Detection</option>
-                  <option>Water Stress</option>
-                </select>
-              </div>
+              <div class="form-group"><label>Type</label><select id="dashType"><option>Crop Health</option><option>Change Detection</option><option>Water Stress</option></select></div>
+              <div class="form-group"><label>Bulk check (Pro)</label><textarea id="bulkLocations" rows="2" placeholder="Optional: one place per line"></textarea><p class="bulk-note">Free: one field. Pro: up to 5 places.</p></div>
               <button class="btn btn-full" id="dashAnalyzeBtn" type="button">Run Analysis</button>
               <div class="result-box" id="dashResultBox" style="display:none">
                 <h4>Your field report</h4>
-                <div class="score-wrap">
-                  <div class="score">-- <span>/ 100</span></div>
-                  <p class="score-meaning" id="dashScoreMeaning">--</p>
-                </div>
+                <div class="lang-toggle" id="reportLangToggle"><button type="button" class="active" data-lang="en" onclick="setReportLang('en')">English</button><button type="button" data-lang="hi" onclick="setReportLang('hi')">हिंदी</button></div>
+                <div class="score-wrap"><div class="score">-- <span>/ 100</span></div><p class="score-meaning" id="dashScoreMeaning">--</p></div>
                 <p class="status">Status: --</p>
                 <div class="compare-line" id="dashCompareLine" style="display:none"></div>
-                <div class="weather-line" id="dashNdviLine" style="display:none"></div>
                 <div class="weather-line" id="dashWeather" style="display:none"></div>
                 <div class="thumb-wrap" id="dashThumbWrap" style="display:none"><img id="dashSatThumb" alt="Field view" /><p class="thumb-cap">Green looks healthier · yellow or red looks weaker</p></div>
-                <p class="summary">--</p>
-                <p class="result-foot" id="dashResultFoot">Saved to My analyses so you can compare next time.</p>
+                <p class="summary" id="dashSummary">--</p>
+                <p class="result-foot">Saved to My analyses so you can compare next time.</p>
+                <div class="share-row">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="copyShareLink()">Copy report link</button>
+                  <button type="button" class="btn btn-outline btn-sm" onclick="shareWhatsApp()">WhatsApp</button>
+                  <button type="button" class="btn btn-outline btn-sm" onclick="printReport()">Print / PDF</button>
+                </div>
               </div>
             </div>
-            <div class="tool-map-wrap">
-              <div class="tool-map" id="dashMap"></div>
-              <div class="ndvi-legend" id="ndviLegend" style="display:none">
-                <span class="leg-low">Low</span><span class="leg-bar"></span><span class="leg-high">High vegetation</span>
-              </div>
-            </div>
+            <div class="tool-map-wrap"><div class="tool-map" id="dashMap"></div><div class="ndvi-legend" id="ndviLegend" style="display:none"><span class="leg-low">Low</span><span class="leg-bar"></span><span class="leg-high">High vegetation</span></div></div>
           </div>
         </section>
-
-        <section id="panel-history" class="dash-panel" style="display:none">
-          <div id="dashboardList" class="dashboard-list"><p class="empty-msg">Loading...</p></div>
-        </section>
-
+        <section id="panel-fields" class="dash-panel" style="display:none"><p class="empty-msg">Save fields with a name so you can open them again.</p><div id="fieldsPanelList" class="field-list"></div></section>
+        <section id="panel-history" class="dash-panel" style="display:none"><div id="dashboardList" class="dashboard-list"><p class="empty-msg">Loading...</p></div></section>
         <section id="panel-settings" class="dash-panel" style="display:none">
           <div class="settings-grid">
-            <div class="settings-card">
-              <h3>Account</h3>
-              <p class="settings-row"><span>Email</span><strong id="settingsEmail">-</strong></p>
-              <p class="settings-row"><span>Display name</span><strong id="settingsName">-</strong></p>
-              <button class="btn btn-outline btn-sm" type="button" onclick="openAuthModal('forgot')">Reset password</button>
-            </div>
-            <div class="settings-card">
-              <h3>Plan</h3>
-              <p class="settings-row"><span>Current plan</span><strong id="settingsPlan">Free</strong></p>
-              <p class="settings-hint" id="settingsPlanHint">5 checks per month on Free.</p>
-              <div class="pricing-grid settings-pricing">
-                <div class="price-card">
-                  <h3>Free</h3>
-                  <div class="price">₹0<span>/month</span></div>
-                  <ul><li>5 checks per month</li><li>Basic crop health</li><li>Short summaries</li></ul>
-                </div>
-                <div class="price-card featured">
-                  <div class="popular">Popular</div>
-                  <h3>Pro</h3>
-                  <div class="price">₹799<span>/month</span></div>
-                  <ul><li>Unlimited checks</li><li>Change detection</li><li>Priority support</li></ul>
-                  <button class="btn btn-full" type="button" onclick="startProCheckout()">Get Pro</button>
-                </div>
-              </div>
-            </div>
+            <div class="settings-card"><h3>Account</h3><p class="settings-row"><span>Email</span><strong id="settingsEmail">-</strong></p><p class="settings-row"><span>Display name</span><strong id="settingsName">-</strong></p></div>
+            <div class="settings-card"><h3>Plan</h3><p class="settings-row"><span>Current plan</span><strong id="settingsPlan">Free</strong></p><p class="settings-hint" id="settingsPlanHint">5 checks per month on Free.</p><button class="btn" type="button" onclick="startProCheckout()">Get Pro</button></div>
           </div>
         </section>
       </main>
@@ -246,25 +195,20 @@
       <p class="auth-switch" id="authSwitch"></p>
     </div>
   </div>
-
   <div id="quotaModal" class="quota-modal" style="display:none" role="dialog" aria-modal="true">
     <div class="quota-overlay" onclick="closeQuotaModal()"></div>
     <div class="quota-box">
       <button type="button" class="quota-close" onclick="closeQuotaModal()" aria-label="Close">×</button>
       <div class="quota-icon">5</div>
       <h2>Free checks used up</h2>
-      <p class="quota-text">You have used all 5 free checks for this month. Upgrade to Pro for unlimited field checks, or wait until next month.</p>
-      <div class="quota-actions">
-        <button type="button" class="btn btn-full" onclick="closeQuotaModal();startProCheckout();">Get Pro (₹799/month)</button>
-        <button type="button" class="btn btn-outline btn-full" onclick="closeQuotaModal()">Maybe later</button>
-      </div>
-      <p class="quota-note">Your past reports stay in My analyses.</p>
+      <p class="quota-text">You have used all 5 free checks for this month.</p>
+      <div class="quota-actions"><button type="button" class="btn btn-full" onclick="closeQuotaModal();startProCheckout();">Get Pro</button><button type="button" class="btn btn-outline btn-full" onclick="closeQuotaModal()">Maybe later</button></div>
     </div>
   </div>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="auth.js"></script>
   <script src="app.js"></script>
+  <script src="features.js"></script>
 </body>
 </html>
