@@ -72,14 +72,12 @@
             <h3>Sample report</h3>
             <div class="form-group"><label>Location</label><input type="text" value="Delhi region" readonly></div>
             <div class="form-group"><label>Date</label><input type="text" value="Recent pass" readonly></div>
-            <div class="form-group"><label>Analysis type</label><select disabled><option>Crop Health</option></select></div>
             <button class="btn btn-full btn-outline" type="button" onclick="openAuthModal('signup')">Sign in to analyze</button>
             <div class="result-box" id="resultBox">
               <h4>Sample result</h4>
               <div class="score-wrap"><div class="score">72 <span>/ 100</span></div><p class="score-meaning" id="demoScoreMeaning">Crop looks okay</p></div>
               <p class="status healthy">Status: Moderately Healthy</p>
               <div class="compare-line">Unlike a photo on Google, this is a scored check you can save and compare later.</div>
-              <div class="weather-line">Weather: warm · moderate humidity</div>
               <div class="thumb-wrap" id="demoThumbWrap" style="display:none"><img id="demoSatThumb" alt="Field view" /><p class="thumb-cap">Green looks healthier · yellow or red looks weaker</p></div>
               <p class="summary">Sample report. Sign in to check your own fields and keep history.</p>
             </div>
@@ -109,6 +107,7 @@
   </div>
 
   <div id="appDashboard" style="display:none">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
     <div class="dash-shell">
       <aside class="sidebar" id="sidebar">
         <div class="side-brand"><a href="/" class="logo">Astra<span>Cropz</span></a></div>
@@ -119,7 +118,7 @@
           <button type="button" class="side-link" data-panel="fields" onclick="showDashPanel('fields')">Saved fields</button>
           <button type="button" class="side-link" data-panel="settings" onclick="showDashPanel('settings')">Settings</button>
         </nav>
-        <div class="side-foot"><p id="usageLine" class="usage-line" style="display:none"></p><button type="button" class="btn btn-outline btn-sm btn-full" onclick="signOutUser()">Sign out</button></div>
+        <div class="side-foot"><p id="usageLine" class="usage-line" style="display:none"></p><button type="button" class="btn btn-outline btn-sm btn-full" onclick="signOut()">Sign out</button></div>
       </aside>
       <main class="dash-main">
         <header class="dash-top"><button type="button" class="side-toggle" onclick="toggleSidebar()" aria-label="Menu">☰</button><h1 id="dashPageTitle">Overview</h1><div class="dash-user" id="dashWelcome">Welcome</div></header>
@@ -145,7 +144,6 @@
               <div class="form-group"><label>Date</label><input type="date" id="dashDate"></div>
               <div class="form-group" id="date2Group" style="display:none"><label>Compare with</label><input type="date" id="dashDate2"></div>
               <div class="form-group"><label>Type</label><select id="dashType"><option>Crop Health</option><option>Change Detection</option><option>Water Stress</option></select></div>
-              <div class="form-group"><label>Bulk check (Pro)</label><textarea id="bulkLocations" rows="2" placeholder="Optional: one place per line"></textarea><p class="bulk-note">Free: one field. Pro: up to 5 places.</p></div>
               <button class="btn btn-full" id="dashAnalyzeBtn" type="button">Run Analysis</button>
               <div class="result-box" id="dashResultBox" style="display:none">
                 <h4>Your field report</h4>
@@ -179,22 +177,6 @@
     </div>
   </div>
 
-  <div id="authModal" class="auth-modal" style="display:none">
-    <div class="auth-overlay" onclick="closeAuthModal()"></div>
-    <div class="auth-box">
-      <button type="button" class="auth-close" onclick="closeAuthModal()" aria-label="Close">×</button>
-      <h2 id="authTitle">Sign in</h2>
-      <p class="auth-sub" id="authSub">Use your email and password</p>
-      <form id="authForm" onsubmit="return handleAuthSubmit(event)">
-        <div class="form-group" id="authNameGroup" style="display:none"><label>Name</label><input type="text" id="authName" autocomplete="name"></div>
-        <div class="form-group"><label>Email</label><input type="email" id="authEmail" required autocomplete="email"></div>
-        <div class="form-group"><label>Password</label><input type="password" id="authPassword" required minlength="6" autocomplete="current-password"></div>
-        <p class="auth-error" id="authError" style="display:none"></p>
-        <button class="btn btn-full" type="submit" id="authSubmit">Sign in</button>
-      </form>
-      <p class="auth-switch" id="authSwitch"></p>
-    </div>
-  </div>
   <div id="quotaModal" class="quota-modal" style="display:none" role="dialog" aria-modal="true">
     <div class="quota-overlay" onclick="closeQuotaModal()"></div>
     <div class="quota-box">
@@ -209,6 +191,10 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="auth.js"></script>
   <script src="app.js"></script>
+  <script>
+  function toggleSidebar(){var s=document.getElementById('sidebar');if(!s)return;if(s.classList.contains('open')){if(typeof closeSidebar==='function')closeSidebar();else s.classList.remove('open');}else{if(typeof openSidebar==='function')openSidebar();else s.classList.add('open');}}
+  window.toggleSidebar=toggleSidebar;
+  </script>
   <script src="features.js"></script>
 </body>
 </html>
