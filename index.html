@@ -129,6 +129,9 @@
             <div class="stat-card"><span class="stat-label">Left</span><strong id="statLeft">5</strong><span class="stat-hint" id="statLeftHint">free checks left</span></div>
             <div class="stat-card"><span class="stat-label">Last field</span><strong id="statLast">None yet</strong><span class="stat-hint">most recent</span></div>
           </div>
+          <h3 class="overview-recent-title">Your fields</h3>
+          <div id="overviewFields" class="overview-fields"></div>
+          <h3 class="overview-recent-title">Recent checks</h3>
           <div id="overviewRecent"></div>
           <div class="overview-actions"><button class="btn" type="button" onclick="showDashPanel('analyze')">New analysis</button><button class="btn btn-outline" type="button" onclick="showDashPanel('history')">View history</button></div>
         </section>
@@ -154,10 +157,11 @@
                 <div class="weather-line" id="dashWeather" style="display:none"></div>
                 <div class="thumb-wrap" id="dashThumbWrap" style="display:none"><img id="dashSatThumb" alt="Field view" /><p class="thumb-cap">Green looks healthier · yellow or red looks weaker</p></div>
                 <p class="summary" id="dashSummary">--</p>
+                <div class="action-line" id="dashActionLine" style="display:none"></div>
                 <p class="result-foot">Saved to My analyses so you can compare next time.</p>
                 <div class="share-row">
                   <button type="button" class="btn btn-outline btn-sm" onclick="copyShareLink()">Copy report link</button>
-                  <button type="button" class="btn btn-outline btn-sm" onclick="shareWhatsApp()">WhatsApp</button>
+                  <button type="button" class="btn btn-sm" onclick="shareWhatsApp()">WhatsApp (Hindi)</button>
                   <button type="button" class="btn btn-outline btn-sm" onclick="printReport()">Print / PDF</button>
                 </div>
               </div>
