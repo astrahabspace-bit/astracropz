@@ -32,7 +32,14 @@ window.openSidebar=openSidebar;
 window.closeSidebar=closeSidebar;
 
 function initAuth(){
-  if(!document.getElementById('authModal')){
+  var needInject=true;
+  var existing=document.getElementById('authModal');
+  if(existing&&document.getElementById('authSubmitBtn')&&document.getElementById('authSuccess')&&document.getElementById('authSubtitle')){
+    needInject=false;
+  }else if(existing){
+    existing.remove();
+  }
+  if(needInject){
     document.body.insertAdjacentHTML('beforeend',
       '<div id="authModal" class="auth-modal" style="display:none">'+
       '<div class="auth-overlay" onclick="closeAuthModal()"></div>'+
@@ -61,13 +68,14 @@ function initAuth(){
       '</div></div>'
     );
   }
-  document.getElementById('authForm').addEventListener('submit',handleAuth);
+  var form=document.getElementById('authForm');
+  if(form)form.addEventListener('submit',handleAuth);
   checkSession();
 }
 
-function openAuthModal(m){mode=m||'signin';switchAuthMode(mode);document.getElementById('authModal').style.display='flex';}
-function closeAuthModal(){document.getElementById('authModal').style.display='none';}
-function closeVerifyPopup(){document.getElementById('verifyPopup').style.display='none';}
+function openAuthModal(m){mode=m||'signin';switchAuthMode(mode);var el=document.getElementById('authModal');if(el)el.style.display='flex';}
+function closeAuthModal(){var el=document.getElementById('authModal');if(el)el.style.display='none';}
+function closeVerifyPopup(){var el=document.getElementById('verifyPopup');if(el)el.style.display='none';}
 
 function switchAuthMode(m){
   mode=m;
@@ -76,52 +84,67 @@ function switchAuthMode(m){
   var sw=document.getElementById('authSwitch'),sub=document.getElementById('authSubtitle');
   var err=document.getElementById('authError'),ok=document.getElementById('authSuccess');
   if(err)err.style.display='none';if(ok)ok.style.display='none';
-  if(m==='signin'){t.textContent='Sign In';b.textContent='Sign In';c.style.display='none';p.style.display='block';if(sub)sub.textContent='Welcome back';sw.innerHTML='No account? <a href="#" onclick="switchAuthMode(\'signup\');return false">Sign up</a>';}
-  else if(m==='signup'){t.textContent='Create Account';b.textContent='Sign Up';c.style.display='block';p.style.display='block';if(sub)sub.textContent='Start checking your fields';sw.innerHTML='Have an account? <a href="#" onclick="switchAuthMode(\'signin\');return false">Sign in</a>';}
-  else{t.textContent='Reset Password';b.textContent='Send Link';c.style.display='none';p.style.display='none';if(sub)sub.textContent='We will email you a reset link';sw.innerHTML='<a href="#" onclick="switchAuthMode(\'signin\');return false">Back to Sign In</a>';}
+  if(!t||!b)return;
+  if(m==='signin'){t.textContent='Sign In';b.textContent='Sign In';if(c)c.style.display='none';if(p)p.style.display='block';if(sub)sub.textContent='Welcome back';if(sw)sw.innerHTML='No account? <a href="#" onclick="switchAuthMode(\'signup\');return false">Sign up</a>';}
+  else if(m==='signup'){t.textContent='Create Account';b.textContent='Sign Up';if(c)c.style.display='block';if(p)p.style.display='block';if(sub)sub.textContent='Start checking your fields';if(sw)sw.innerHTML='Have an account? <a href="#" onclick="switchAuthMode(\'signin\');return false">Sign in</a>';}
+  else{t.textContent='Reset Password';b.textContent='Send Link';if(c)c.style.display='none';if(p)p.style.display='none';if(sub)sub.textContent='We will email you a reset link';if(sw)sw.innerHTML='<a href="#" onclick="switchAuthMode(\'signin\');return false">Back to Sign In</a>';}
 }
 
 async function handleAuth(e){
   e.preventDefault();
-  var btn=document.getElementById('authSubmitBtn');btn.disabled=true;
-  var email=document.getElementById('authEmail').value.trim();
-  var pass=document.getElementById('authPassword').value;
-  var err=document.getElementById('authError');err.style.display='none';
+  var err=document.getElementById('authError');
+  var ok=document.getElementById('authSuccess');
+  var btn=document.getElementById('authSubmitBtn');
+  if(err)err.style.display='none';
+  if(ok)ok.style.display='none';
+  var email=(document.getElementById('authEmail')||{}).value||'';
+  var pass=(document.getElementById('authPassword')||{}).value||'';
+  email=String(email).trim();
+  if(btn)btn.disabled=true;
   try{
     if(mode==='signup'){
-      if(pass!==document.getElementById('authConfirmPassword').value){err.textContent='Passwords do not match';err.style.display='block';return;}
-      var r=await sb.auth.signUp({email:email,password:pass,options:{emailRedirectTo:'https://astracropz.vercel.app'}});
-      if(r.error){err.textContent=r.error.message;err.style.display='block';return;}
-      closeAuthModal();document.getElementById('verifyPopup').style.display='flex';
+      var conf=(document.getElementById('authConfirmPassword')||{}).value||'';
+      if(pass!==conf){if(err){err.textContent='Passwords do not match.';err.style.display='block';}return;}
+      var r=await sb.auth.signUp({email:email,password:pass});
+      if(r.error){
+        if(err){err.textContent=r.error.message.indexOf('already')!==-1?'Account already exists. Please sign in.':r.error.message;err.style.display='block';}
+        return;
+      }
+      closeAuthModal();
+      var vp=document.getElementById('verifyPopup');
+      if(vp)vp.style.display='flex';
+      if(r.data.session)enterDashboard(r.data.user);
     }else if(mode==='signin'){
       var r2=await sb.auth.signInWithPassword({email:email,password:pass});
-      if(r2.error){err.textContent=r2.error.message;err.style.display='block';return;}
+      if(r2.error){if(err){err.textContent=r2.error.message;err.style.display='block';}return;}
       closeAuthModal();enterDashboard(r2.data.user);
     }else{
       var r3=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://astracropz.vercel.app'});
-      if(r3.error){err.textContent=r3.error.message;err.style.display='block';return;}
-      document.getElementById('authSuccess').textContent='Reset link sent. Check your inbox.';
-      document.getElementById('authSuccess').style.display='block';
+      if(r3.error){if(err){err.textContent=r3.error.message;err.style.display='block';}return;}
+      if(ok){ok.textContent='Reset link sent. Check your inbox.';ok.style.display='block';}
     }
-  }catch(x){err.textContent='Something went wrong. Please try again.';err.style.display='block';}
-  finally{btn.disabled=false;}
+  }catch(x){if(err){err.textContent='Something went wrong. Please try again.';err.style.display='block';}}
+  finally{if(btn)btn.disabled=false;}
 }
 
 async function checkSession(){
-  var s=await sb.auth.getSession();
-  if(s.data.session)enterDashboard(s.data.session.user);
+  try{
+    var s=await sb.auth.getSession();
+    if(s.data.session)enterDashboard(s.data.session.user);
+  }catch(e){}
 }
 
 function enterDashboard(user){
   var pub=document.getElementById('publicSite');
   var app=document.getElementById('appDashboard');
   if(pub)pub.style.display='none';
-  if(app)app.style.display='flex';
+  if(app){app.style.display='flex';app.style.minHeight='100vh';app.style.width='100%';}
 
   var name=displayNameFromUser(user);
   var welcome=document.getElementById('welcomeTitle');
   var welcomeSub=document.getElementById('welcomeSub');
   if(welcome)welcome.textContent='Welcome, '+name;
+  var dw=document.getElementById('dashWelcome');if(dw)dw.textContent='Welcome, '+name;
   if(welcomeSub)welcomeSub.textContent='Your field checks in one place';
 
   var se=document.getElementById('settingsEmail');
@@ -143,10 +166,11 @@ function enterDashboard(user){
   window.scrollTo(0,0);
 }
 
-async function signOut(){await sb.auth.signOut();location.href='/';}
+async function signOut(){try{await sb.auth.signOut();}catch(e){}location.href='/';}
 
 window.openAuthModal=openAuthModal;window.closeAuthModal=closeAuthModal;
 window.closeVerifyPopup=closeVerifyPopup;window.switchAuthMode=switchAuthMode;
-window.signOut=signOut;window.displayNameFromUser=displayNameFromUser;window.enterDashboard=enterDashboard;
+window.signOut=signOut;window.signOutUser=signOut;
+window.displayNameFromUser=displayNameFromUser;window.enterDashboard=enterDashboard;
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAuth);else initAuth();
