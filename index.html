@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AstraCropz — Crop health from space for Indian farms</title>
-  <meta name="description" content="Check crop health with a simple score from satellite images. Built in India for farms and FPOs.">
+  <title>AstraCropz — Spot crop stress earlier for Indian farms</title>
+  <meta name="description" content="Get a clear crop health score for any field from satellite images. Built in India for farms and FPOs so you can act before the crop looks bad from the road.">
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://astracropz.vercel.app/">
-  <meta property="og:title" content="AstraCropz — Crop health from space">
-  <meta property="og:description" content="Simple crop health scores for Indian farms and FPOs.">
+  <meta property="og:title" content="AstraCropz — Spot crop stress earlier">
+  <meta property="og:description" content="A simple field score you can save, compare, and share with your team.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 </head>
@@ -21,7 +21,7 @@
       <div class="container nav-inner">
         <a href="/" class="logo">Astra<span>Cropz</span></a>
         <div class="nav-links">
-          <a href="#features">Features</a>
+          <a href="#help">How it helps</a>
           <a href="#how">How it works</a>
           <a href="#tool">Demo</a>
           <a href="#pricing">Pricing</a>
@@ -32,54 +32,93 @@
       </div>
     </nav>
     <header class="hero">
-      <div class="container">
-        <div class="badge">Satellite + AI · Built in India</div>
-        <h1>Crop health reports<br>from space</h1>
-        <p class="hero-sub">See how your crops are doing with satellite images. Built for farms and agri businesses in India.</p>
-        <div class="hero-cta">
-          <button class="btn" onclick="openAuthModal('signin')">Sign In</button>
-          <a href="#how" class="btn btn-outline">See how it works</a>
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="badge">Built in India for farms and FPOs</div>
+          <h1>Know if a field is slipping<br><span class="hero-accent">before you walk every acre</span></h1>
+          <p class="hero-sub">AstraCropz turns satellite images into a simple 0–100 crop health score for the field you pick. See weak spots earlier, keep history, and share one clear note on WhatsApp.</p>
+          <ul class="hero-points">
+            <li>Catch stress before it shows from the road</li>
+            <li>Compare this week with the last check</li>
+            <li>Forward one short report to members</li>
+          </ul>
+          <div class="hero-cta">
+            <button class="btn btn-lg" onclick="openAuthModal('signup')">Try free — 5 checks</button>
+            <a href="#tool" class="btn btn-outline btn-lg">See sample report</a>
+          </div>
+          <p class="hero-trust-line">No app install. Works on phone. Free to start.</p>
+        </div>
+        <div class="hero-card" aria-hidden="true">
+          <div class="hero-card-top">
+            <span class="hero-card-label">Sample field · Delhi</span>
+            <span class="hero-card-pill">Live score</span>
+          </div>
+          <div class="hero-score-row">
+            <div class="hero-score">72<span>/100</span></div>
+            <div class="hero-score-meta">
+              <strong>Crop looks okay</strong>
+              <span>Watch moisture this week</span>
+            </div>
+          </div>
+          <div class="hero-bar"><i style="width:72%"></i></div>
+          <div class="hero-card-foot">
+            <span>Saved history</span>
+            <span>WhatsApp ready</span>
+          </div>
         </div>
       </div>
     </header>
-    <section id="features" class="section">
+    <div class="trust-strip">
+      <div class="container trust-inner">
+        <span>Satellite field view</span>
+        <span class="dot"></span>
+        <span>Clear next step</span>
+        <span class="dot"></span>
+        <span>History you can compare</span>
+        <span class="dot"></span>
+        <span>Made for Indian farms</span>
+      </div>
+    </div>
+    <section id="help" class="section">
       <div class="container">
-        <h2 class="section-title">Why AstraCropz</h2>
+        <h2 class="section-title">How this actually helps</h2>
+        <p class="section-lead">Walking every plot every week is hard. Waiting until yellow patches show is late. A field score gives an earlier, wider view so you can decide what to check next.</p>
         <div class="features-grid">
-          <div class="feature-card"><div class="feature-icon">01</div><h3>Crop health score</h3><p>A simple 0–100 score for the field you pick — not just a photo</p></div>
-          <div class="feature-card"><div class="feature-icon">02</div><h3>Field map</h3><p>Spot healthy and weak areas on the map</p></div>
-          <div class="feature-card"><div class="feature-icon">03</div><h3>Simple reports</h3><p>Score, weather, and what you can do next</p></div>
-          <div class="feature-card"><div class="feature-icon">04</div><h3>Your history</h3><p>Every check is saved so you can see if the field got better or worse</p></div>
+          <div class="feature-card elev"><div class="feature-icon">01</div><h3>Earlier signal</h3><p>See if green activity is dropping across the whole field — not only the path you walked today.</p></div>
+          <div class="feature-card elev"><div class="feature-icon">02</div><h3>One number, clear meaning</h3><p>0–100 score plus plain words: looks good, needs a look, or weak. Easy to share with members.</p></div>
+          <div class="feature-card elev"><div class="feature-icon">03</div><h3>Memory over weeks</h3><p>Save checks so you know if a plot improved after irrigation or dropped after dry days.</p></div>
+          <div class="feature-card elev"><div class="feature-icon">04</div><h3>Built for FPO scale</h3><p>Pick a field, get a short report, copy or WhatsApp it. Useful when you manage many members.</p></div>
         </div>
       </div>
     </section>
     <section id="how" class="section section-alt">
       <div class="container">
-        <h2 class="section-title">How it works</h2>
+        <h2 class="section-title">Three steps</h2>
         <div class="steps">
-          <div class="step"><div class="step-num">1</div><h3>Pick a field</h3><p>Click the map or type a place</p></div>
-          <div class="step"><div class="step-num">2</div><h3>Choose a date</h3><p>Pick the day you want to check</p></div>
-          <div class="step"><div class="step-num">3</div><h3>Get the report</h3><p>Score, weather, and short tips</p></div>
+          <div class="step elev"><div class="step-num">1</div><h3>Pick a field</h3><p>Click the map or type a place near your farm</p></div>
+          <div class="step elev"><div class="step-num">2</div><h3>Run a check</h3><p>We read recent satellite images for that spot</p></div>
+          <div class="step elev"><div class="step-num">3</div><h3>Act on the score</h3><p>See the number, short tip, and share with your team</p></div>
         </div>
       </div>
     </section>
     <section id="tool" class="section">
       <div class="container">
-        <h2 class="section-title">Live Demo</h2>
-        <p class="demo-note">Sample field near Delhi. Sign in to check your own fields.</p>
-        <div class="tool-wrapper">
+        <h2 class="section-title">Sample report</h2>
+        <p class="demo-note">This is a sample near Delhi. Sign in free to check your own fields and keep history.</p>
+        <div class="tool-wrapper elev-lg">
           <div class="tool-sidebar">
-            <h3>Sample report</h3>
+            <h3>What you get</h3>
             <div class="form-group"><label>Location</label><input type="text" value="Delhi region" readonly></div>
             <div class="form-group"><label>Date</label><input type="text" value="Recent pass" readonly></div>
-            <button class="btn btn-full btn-outline" type="button" onclick="openAuthModal('signup')">Sign in to analyze</button>
+            <button class="btn btn-full" type="button" onclick="openAuthModal('signup')">Sign up free to check your field</button>
             <div class="result-box" id="resultBox">
               <h4>Sample result</h4>
               <div class="score-wrap"><div class="score">72 <span>/ 100</span></div><p class="score-meaning" id="demoScoreMeaning">Crop looks okay</p></div>
               <p class="status healthy">Status: Moderately Healthy</p>
               <div class="compare-line">Unlike a photo on Google, this is a scored check you can save and compare later.</div>
               <div class="thumb-wrap" id="demoThumbWrap" style="display:none"><img id="demoSatThumb" alt="Field view" /><p class="thumb-cap">Green looks healthier · yellow or red looks weaker</p></div>
-              <p class="summary">Sample report. Sign in to check your own fields and keep history.</p>
+              <p class="summary">Sample report. Create a free account to run this on your own plots.</p>
             </div>
           </div>
           <div class="tool-map-wrap"><div class="tool-map" id="map"></div></div>
@@ -88,24 +127,30 @@
     </section>
     <section id="pricing" class="section section-alt">
       <div class="container">
-        <h2 class="section-title">Pricing</h2>
+        <h2 class="section-title">Simple pricing</h2>
         <div class="pricing-grid">
-          <div class="price-card"><h3>Free</h3><div class="price">₹0<span>/month</span></div><ul><li>5 checks per month</li><li>Basic crop health</li><li>Short summaries</li></ul><button class="btn btn-outline btn-full" onclick="openAuthModal('signup')">Start free</button></div>
-          <div class="price-card featured"><div class="popular">Popular</div><h3>Pro</h3><div class="price">₹799<span>/month</span></div><ul><li>Unlimited checks</li><li>Change detection</li><li>Priority support</li></ul><button class="btn btn-full" onclick="openAuthModal('signup')">Get Pro</button></div>
+          <div class="price-card elev"><h3>Free</h3><div class="price">₹0<span>/month</span></div><ul><li>5 checks per month</li><li>Crop health score</li><li>Short next step</li><li>History on your account</li></ul><button class="btn btn-outline btn-full" onclick="openAuthModal('signup')">Start free</button></div>
+          <div class="price-card featured elev"><div class="popular">Popular</div><h3>Pro</h3><div class="price">₹799<span>/month</span></div><ul><li>Unlimited checks</li><li>Change over time</li><li>Priority support</li><li>Best for FPO managers</li></ul><button class="btn btn-full" onclick="openAuthModal('signup')">Get Pro</button></div>
         </div>
       </div>
     </section>
     <section id="about-teaser" class="section">
       <div class="container about-wrap">
         <h2 class="section-title">Why we built this</h2>
-        <p>AstraCropz was started by Shantanu Dutta in Prayagraj. Farms and FPOs should get a clear crop health score from space, without expensive tools.</p>
+        <p>AstraCropz was started by Shantanu Dutta in Prayagraj. Farms and FPOs should get a clear crop health score without buying expensive tools.</p>
         <p>It sits under Astrahab — a longer path toward space systems that help people on the ground.</p>
         <p><a href="about.html" class="btn btn-outline">Read about the founder</a></p>
       </div>
     </section>
+    <section class="section cta-band">
+      <div class="container cta-band-inner">
+        <h2>Check one field this week</h2>
+        <p>Free account. Five checks. See if the score matches what you know on the ground.</p>
+        <button class="btn btn-lg" onclick="openAuthModal('signup')">Create free account</button>
+      </div>
+    </section>
     <footer class="footer"><div class="container"><p>© 2026 AstraCropz · Built in India · <a href="about.html">About</a> · <a href="blog/">Blog</a></p></div></footer>
   </div>
-
   <div id="appDashboard" style="display:none">
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
     <div class="dash-shell">
@@ -180,7 +225,6 @@
       </main>
     </div>
   </div>
-
   <div id="quotaModal" class="quota-modal" style="display:none" role="dialog" aria-modal="true">
     <div class="quota-overlay" onclick="closeQuotaModal()"></div>
     <div class="quota-box">
