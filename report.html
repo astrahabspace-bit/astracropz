@@ -25,6 +25,8 @@
         <div class="score" id="rScore">-- <span>/ 100</span></div>
         <p class="score-meaning" id="rMeaning"></p>
       </div>
+      <p class="date-meta" id="rImageDate" style="display:none"></p>
+      <p class="date-meta ground" id="rGroundDate" style="display:none"></p>
       <p class="status" id="rStatus"></p>
       <p class="summary" id="rSummary" style="margin-top:12px"></p>
       <p class="result-foot" id="rMeta"></p>
@@ -46,10 +48,16 @@
       document.getElementById('rScore').innerHTML=(d.s!=null?d.s:'--')+' <span>/ 100</span>';
       document.getElementById('rMeaning').textContent=d.m||'';
       document.getElementById('rStatus').textContent=d.st?('Status: '+d.st):'';
+      var imgEl=document.getElementById('rImageDate');
+      if(imgEl){if(d.img){imgEl.style.display='block';imgEl.textContent='Satellite image: '+d.img;}else{imgEl.style.display='none';}}
+      var gEl=document.getElementById('rGroundDate');
+      if(gEl){if(d.g){gEl.style.display='block';gEl.textContent='Ground check: '+d.g;}else{gEl.style.display='none';}}
       document.getElementById('rSummary').textContent=d.sum||'';
       var meta=[];
       if(d.c)meta.push('Crop: '+d.c);
       if(d.w)meta.push('Weather: '+d.w);
+      if(d.img)meta.push('Image: '+d.img);
+      if(d.g)meta.push('Ground: '+d.g);
       document.getElementById('rMeta').textContent=meta.join(' · ')||'Shared from AstraCropz';
       document.title=(d.l||'Field')+' — score '+(d.s!=null?d.s:'--')+' | AstraCropz';
     }catch(e){
