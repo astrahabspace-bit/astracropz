@@ -1,1 +1,251 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AstraCropz — Spot crop stress earlier for Indian farms</title>
+  <meta name="description" content="Get a clear crop health score for any field from satellite images. Built in India for farms and FPOs so you can act before the crop looks bad from the road.">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://astracropz.vercel.app/">
+  <meta property="og:title" content="AstraCropz — Spot crop stress earlier">
+  <meta property="og:description" content="A simple field score you can save, compare, and share with your team.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
+</head>
+<body>
+  <div id="publicSite">
+    <nav class="nav">
+      <div class="container nav-inner">
+        <a href="/" class="logo">Astra<span>Cropz</span></a>
+        <div class="nav-links">
+          <a href="#help">How it helps</a>
+          <a href="#how">How it works</a>
+          <a href="#tool">Demo</a>
+          <a href="#pricing">Pricing</a>
+          <a href="blog/">Blog</a>
+          <a href="about.html">About</a>
+        </div>
+        <button class="btn btn-sm btn-outline" id="signInBtn" onclick="openAuthModal('signin')">Sign In</button>
+      </div>
+    </nav>
+    <header class="hero">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="badge">Built in India for farms and FPOs</div>
+          <h1>Know if a field is slipping<br><span class="hero-accent">before you walk every acre</span></h1>
+          <p class="hero-sub">AstraCropz turns satellite images into a simple 0–100 crop health score for the field you pick. See weak spots earlier, keep history, and share one clear note on WhatsApp.</p>
+          <ul class="hero-points">
+            <li>Catch stress before it shows from the road</li>
+            <li>Compare this week with the last check</li>
+            <li>Forward one short report to members</li>
+          </ul>
+          <div class="hero-cta">
+            <button class="btn btn-lg" onclick="openAuthModal('signup')">Try free — 5 checks</button>
+            <a href="#tool" class="btn btn-outline btn-lg">See sample report</a>
+          </div>
+          <p class="hero-trust-line">No app install. Works on phone. Free to start.</p>
+        </div>
+        <div class="hero-card" aria-hidden="true">
+          <div class="hero-card-top">
+            <span class="hero-card-label">Sample field · Delhi</span>
+            <span class="hero-card-pill">Live score</span>
+          </div>
+          <div class="hero-score-row">
+            <div class="hero-score">72<span>/100</span></div>
+            <div class="hero-score-meta">
+              <strong>Crop looks okay</strong>
+              <span>Watch moisture this week</span>
+            </div>
+          </div>
+          <div class="hero-bar"><i style="width:72%"></i></div>
+          <div class="hero-card-foot">
+            <span>Saved history</span>
+            <span>WhatsApp ready</span>
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="trust-strip">
+      <div class="container trust-inner">
+        <span>Satellite field view</span>
+        <span class="dot"></span>
+        <span>Clear next step</span>
+        <span class="dot"></span>
+        <span>History you can compare</span>
+        <span class="dot"></span>
+        <span>Made for Indian farms</span>
+      </div>
+    </div>
+    <section id="help" class="section">
+      <div class="container">
+        <h2 class="section-title">How this actually helps</h2>
+        <p class="section-lead">Walking every plot every week is hard. Waiting until yellow patches show is late. A field score gives an earlier, wider view so you can decide what to check next.</p>
+        <div class="features-grid">
+          <div class="feature-card elev"><div class="feature-icon">01</div><h3>Earlier signal</h3><p>See if green activity is dropping across the whole field — not only the path you walked today.</p></div>
+          <div class="feature-card elev"><div class="feature-icon">02</div><h3>One number, clear meaning</h3><p>0–100 score plus plain words: looks good, needs a look, or weak. Easy to share with members.</p></div>
+          <div class="feature-card elev"><div class="feature-icon">03</div><h3>Memory over weeks</h3><p>Save checks so you know if a plot improved after irrigation or dropped after dry days.</p></div>
+          <div class="feature-card elev"><div class="feature-icon">04</div><h3>Built for FPO scale</h3><p>Pick a field, get a short report, copy or WhatsApp it. Useful when you manage many members.</p></div>
+        </div>
+      </div>
+    </section>
+    <section id="how" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title">Three steps</h2>
+        <div class="steps">
+          <div class="step elev"><div class="step-num">1</div><h3>Pick a field</h3><p>Click the map or type a place near your farm</p></div>
+          <div class="step elev"><div class="step-num">2</div><h3>Run a check</h3><p>We read recent satellite images for that spot</p></div>
+          <div class="step elev"><div class="step-num">3</div><h3>Act on the score</h3><p>See the number, short tip, and share with your team</p></div>
+        </div>
+      </div>
+    </section>
+    <section id="tool" class="section">
+      <div class="container">
+        <h2 class="section-title">Sample report</h2>
+        <p class="demo-note">This is a sample near Delhi. Sign in free to check your own fields and keep history.</p>
+        <div class="tool-wrapper elev-lg">
+          <div class="tool-sidebar">
+            <h3>What you get</h3>
+            <div class="form-group"><label>Location</label><input type="text" value="Delhi region" readonly></div>
+            <div class="form-group"><label>Date</label><input type="text" value="Recent pass" readonly></div>
+            <button class="btn btn-full" type="button" onclick="openAuthModal('signup')">Sign up free to check your field</button>
+            <div class="result-box" id="resultBox">
+              <h4>Sample result</h4>
+              <div class="score-wrap"><div class="score">72 <span>/ 100</span></div><p class="score-meaning" id="demoScoreMeaning">Crop looks okay</p></div>
+              <p class="status healthy">Status: Moderately Healthy</p>
+              <div class="compare-line">Unlike a photo on Google, this is a scored check you can save and compare later.</div>
+              <div class="thumb-wrap" id="demoThumbWrap" style="display:none"><img id="demoSatThumb" alt="Field view" /><p class="thumb-cap">Green looks healthier · yellow or red looks weaker</p></div>
+              <p class="summary">Sample report. Create a free account to run this on your own plots.</p>
+            </div>
+          </div>
+          <div class="tool-map-wrap"><div class="tool-map" id="map"></div></div>
+        </div>
+      </div>
+    </section>
+    <section id="pricing" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title">Simple pricing</h2>
+        <div class="pricing-grid">
+          <div class="price-card elev"><h3>Free</h3><div class="price">₹0<span>/month</span></div><ul><li>5 checks per month</li><li>Crop health score</li><li>Short next step</li><li>History on your account</li></ul><button class="btn btn-outline btn-full" onclick="openAuthModal('signup')">Start free</button></div>
+          <div class="price-card featured elev"><div class="popular">Popular</div><h3>Pro</h3><div class="price">₹799<span>/month</span></div><ul><li>Unlimited checks</li><li>Change over time</li><li>Priority support</li><li>Best for FPO managers</li></ul><button class="btn btn-full" onclick="openAuthModal('signup')">Get Pro</button></div>
+        </div>
+      </div>
+    </section>
+    <section id="about-teaser" class="section">
+      <div class="container about-wrap">
+        <h2 class="section-title">Why we built this</h2>
+        <p>AstraCropz was started by Shantanu Dutta in Prayagraj. Farms and FPOs should get a clear crop health score without buying expensive tools.</p>
+        <p>It sits under Astrahab — a longer path toward space systems that help people on the ground.</p>
+        <p><a href="about.html" class="btn btn-outline">Read about the founder</a></p>
+      </div>
+    </section>
+    <section class="section cta-band">
+      <div class="container cta-band-inner">
+        <h2>Check one field this week</h2>
+        <p>Free account. Five checks. See if the score matches what you know on the ground.</p>
+        <button class="btn btn-lg" onclick="openAuthModal('signup')">Create free account</button>
+      </div>
+    </section>
+    <footer class="footer"><div class="container"><p>© 2026 AstraCropz · Built in India · <a href="about.html">About</a> · <a href="blog/">Blog</a></p></div></footer>
+  </div>
+  <div id="appDashboard" style="display:none">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <div class="dash-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="side-brand"><a href="/" class="logo">Astra<span>Cropz</span></a></div>
+        <nav class="side-nav">
+          <button type="button" class="side-link active" data-panel="overview" onclick="showDashPanel('overview')">Overview</button>
+          <button type="button" class="side-link" data-panel="analyze" onclick="showDashPanel('analyze')">New analysis</button>
+          <button type="button" class="side-link" data-panel="history" onclick="showDashPanel('history')">My analyses</button>
+          <button type="button" class="side-link" data-panel="fields" onclick="showDashPanel('fields')">Saved fields</button>
+          <button type="button" class="side-link" data-panel="settings" onclick="showDashPanel('settings')">Settings</button>
+        </nav>
+        <div class="side-foot"><p id="usageLine" class="usage-line" style="display:none"></p><button type="button" class="btn btn-outline btn-sm btn-full" onclick="signOut()">Sign out</button></div>
+      </aside>
+      <main class="dash-main">
+        <header class="dash-top"><button type="button" class="side-toggle" onclick="toggleSidebar()" aria-label="Menu">☰</button><h1 id="dashPageTitle">Overview</h1><div class="dash-user" id="dashWelcome">Welcome</div></header>
+        <section id="panel-overview" class="dash-panel">
+          <div id="scoreAlert" class="alert-banner empty">Run a few checks to see if any field score drops.</div>
+          <div class="stat-grid">
+            <div class="stat-card"><span class="stat-label">This month</span><strong id="statMonth">0</strong><span class="stat-hint">checks used</span></div>
+            <div class="stat-card"><span class="stat-label">Left</span><strong id="statLeft">5</strong><span class="stat-hint" id="statLeftHint">free checks left</span></div>
+            <div class="stat-card"><span class="stat-label">Last field</span><strong id="statLast">None yet</strong><span class="stat-hint">most recent</span></div>
+          </div>
+          <h3 class="overview-recent-title">Your fields</h3>
+          <div id="overviewFields" class="overview-fields"></div>
+          <h3 class="overview-recent-title">Recent checks</h3>
+          <div id="overviewRecent"></div>
+          <div class="overview-actions"><button class="btn" type="button" onclick="showDashPanel('analyze')">New analysis</button><button class="btn btn-outline" type="button" onclick="showDashPanel('history')">View history</button></div>
+        </section>
+        <section id="panel-analyze" class="dash-panel" style="display:none">
+          <div class="tool-wrapper dash-tool">
+            <div class="tool-sidebar">
+              <h3>Check a field</h3>
+              <div class="form-group"><label>Saved fields</label><div class="field-list" id="savedFieldList"><p class="field-hint">No saved fields yet</p></div></div>
+              <div class="form-group"><label>Field location</label><input type="text" id="dashLocation" value="Delhi region" placeholder="Click map or type a place"><p class="field-hint">Click the map to pick your field</p>
+                <div class="field-save-row"><input type="text" id="fieldNameInput" placeholder="Name e.g. Plot 3 North"><button type="button" class="btn btn-outline btn-sm" onclick="saveCurrentField()">Save</button></div>
+              </div>
+              <div class="form-group"><label>Crop type</label><select id="dashCrop"><option value="">Not set</option><option>Wheat</option><option>Paddy</option><option>Vegetables</option><option>Pulses</option><option>Cotton</option><option>Sugarcane</option><option>Other</option></select></div>
+              <div class="form-group"><label>Date</label><input type="date" id="dashDate"></div>
+              <div class="form-group" id="date2Group" style="display:none"><label>Compare with</label><input type="date" id="dashDate2"></div>
+              <div class="form-group"><label>Type</label><select id="dashType"><option>Crop Health</option><option>Change Detection</option><option>Water Stress</option></select></div>
+              <div class="form-group"><label>Ground check date (optional)</label><input type="date" id="groundCheckDate"><p class="field-hint">Date you walked the field — helps compare with the satellite score</p></div>
+              <button class="btn btn-full" id="dashAnalyzeBtn" type="button">Run Analysis</button>
+              <div class="result-box" id="dashResultBox" style="display:none">
+                <h4>Your field report</h4>
+                <div class="lang-toggle" id="reportLangToggle"><button type="button" class="active" data-lang="en" onclick="setReportLang('en')">English</button><button type="button" data-lang="hi" onclick="setReportLang('hi')">हिंदी</button></div>
+                <div class="score-wrap"><div class="score">-- <span>/ 100</span></div><p class="score-meaning" id="dashScoreMeaning">--</p></div>
+                <p class="date-meta" id="dashImageDate" style="display:none"></p>
+                <p class="date-meta ground" id="dashGroundDate" style="display:none"></p>
+                <p class="status">Status: --</p>
+                <div class="compare-line" id="dashCompareLine" style="display:none"></div>
+                <div class="weather-line" id="dashWeather" style="display:none"></div>
+                <div class="thumb-wrap" id="dashThumbWrap" style="display:none"><img id="dashSatThumb" alt="Field view" /><p class="thumb-cap">Green looks healthier · yellow or red looks weaker</p></div>
+                <p class="summary" id="dashSummary">--</p>
+                <div class="action-line" id="dashActionLine" style="display:none"></div>
+                <p class="result-foot">Saved to My analyses so you can compare next time.</p>
+                <div class="share-row">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="copyShareLink()">Copy report link</button>
+                  <button type="button" class="btn btn-sm" onclick="shareWhatsApp()">WhatsApp (Hindi)</button>
+                  <button type="button" class="btn btn-outline btn-sm" onclick="printReport()">Print / PDF</button>
+                </div>
+              </div>
+            </div>
+            <div class="tool-map-wrap"><div class="tool-map" id="dashMap"></div><div class="ndvi-legend" id="ndviLegend" style="display:none"><span class="leg-low">Low</span><span class="leg-bar"></span><span class="leg-high">High vegetation</span></div></div>
+          </div>
+        </section>
+        <section id="panel-fields" class="dash-panel" style="display:none"><p class="empty-msg">Save fields with a name so you can open them again.</p><div id="fieldsPanelList" class="field-list"></div></section>
+        <section id="panel-history" class="dash-panel" style="display:none"><div id="dashboardList" class="dashboard-list"><p class="empty-msg">Loading...</p></div></section>
+        <section id="panel-settings" class="dash-panel" style="display:none">
+          <div class="settings-grid">
+            <div class="settings-card"><h3>Account</h3><p class="settings-row"><span>Email</span><strong id="settingsEmail">-</strong></p><p class="settings-row"><span>Display name</span><strong id="settingsName">-</strong></p></div>
+            <div class="settings-card"><h3>Plan</h3><p class="settings-row"><span>Current plan</span><strong id="settingsPlan">Free</strong></p><p class="settings-hint" id="settingsPlanHint">5 checks per month on Free.</p><button class="btn" type="button" onclick="startProCheckout()">Get Pro</button></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <div id="quotaModal" class="quota-modal" style="display:none" role="dialog" aria-modal="true">
+    <div class="quota-overlay" onclick="closeQuotaModal()"></div>
+    <div class="quota-box">
+      <button type="button" class="quota-close" onclick="closeQuotaModal()" aria-label="Close">×</button>
+      <div class="quota-icon">5</div>
+      <h2>Free checks used up</h2>
+      <p class="quota-text">You have used all 5 free checks for this month.</p>
+      <div class="quota-actions"><button type="button" class="btn btn-full" onclick="closeQuotaModal();startProCheckout();">Get Pro</button><button type="button" class="btn btn-outline btn-full" onclick="closeQuotaModal()">Maybe later</button></div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="auth.js"></script>
+  <script src="app.js"></script>
+  <script>
+  function toggleSidebar(){var s=document.getElementById('sidebar');if(!s)return;if(s.classList.contains('open')){if(typeof closeSidebar==='function')closeSidebar();else s.classList.remove('open');}else{if(typeof openSidebar==='function')openSidebar();else s.classList.add('open');}}
+  window.toggleSidebar=toggleSidebar;
+  </script>
+  <script src="features.js"></script>
+</body>
+</html>
