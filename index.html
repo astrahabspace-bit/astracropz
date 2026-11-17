@@ -101,10 +101,6 @@
     <section id="about-teaser" class="section section-alt"><div class="container about-wrap"><h2 class="section-title">Why we built this</h2><p>AstraCropz was started by Shantanu Dutta in Prayagraj. Farms and FPOs should get a clear crop health score without buying expensive tools.</p><p>It sits under Astrahab — a longer path toward space systems that help people on the ground.</p><p><a href="about.html" class="btn btn-outline">Read about the founder</a></p></div></section>
     <section class="section cta-band"><div class="container cta-band-inner"><h2>Check one of your fields this week</h2><p>Free account. Five checks. See if the score matches what you see on the ground.</p><button class="btn btn-lg" onclick="openAuthModal('signup')">Create free account</button></div></section>
     <footer class="footer"><div class="container"><p>© 2026 AstraCropz · Built in India · <a href="about.html">About</a> · <a href="blog/">Blog</a></p></div></footer>
-
-    <div class="mobile-cta" id="mobileCta">
-      <button type="button" class="btn btn-full" onclick="openAuthModal('signup')">Try free — 5 checks</button>
-    </div>
   </div>
   <div id="appDashboard" style="display:none">
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
@@ -142,7 +138,7 @@
                 <div class="field-save-row"><input type="text" id="fieldNameInput" placeholder="Name e.g. Plot 3 North"><button type="button" class="btn btn-outline btn-sm" onclick="saveCurrentField()">Save</button></div>
               </div>
               <div class="form-group"><label>Crop type</label><select id="dashCrop"><option value="">Not set</option><option>Wheat</option><option>Paddy</option><option>Vegetables</option><option>Pulses</option><option>Cotton</option><option>Sugarcane</option><option>Other</option></select></div>
-              <div class="form-group"><label>Date</label><input type="date" id="dashDate"></div>
+              <div class="form-group"><label>Check date</label><input type="date" id="dashDate" max=""><p class="field-hint">Pick today or an earlier date to see that period</p></div>
               <div class="form-group" id="date2Group" style="display:none"><label>Compare with</label><input type="date" id="dashDate2"></div>
               <div class="form-group"><label>Type</label><select id="dashType"><option>Crop Health</option><option>Change Detection</option><option>Water Stress</option></select></div>
               <div class="form-group"><label>Ground check date (optional)</label><input type="date" id="groundCheckDate"><p class="field-hint">Date you walked the field — helps compare with the satellite score</p></div>
